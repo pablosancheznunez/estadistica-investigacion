@@ -1,0 +1,179 @@
+---
+engine: markdown
+---
+
+# Capítulo 1. Pensar con datos {#sec-cap1}
+
+::: {.callout-note appearance="default"}
+## Objetivos
+- Formular la pregunta de investigación según su tipo: descriptiva, exploratoria, inferencial, predictiva, causal o mecanicista.
+- Clasificar variables y elegir el diseño que puede responder a la pregunta.
+- Distinguir correlación de causalidad y reconocer las variables de confusión.
+:::
+
+::: {.callout-note appearance="simple" icon="false"}
+## Glosario del capítulo
+[Población y muestra](92-glosario.qmd#gl-poblacion) · [Variable](92-glosario.qmd#gl-variable) · [Estudio observacional](92-glosario.qmd#gl-observacional) · [Experimento aleatorizado](92-glosario.qmd#gl-experimento) · [Variable de confusión](92-glosario.qmd#gl-confusion) · [Validez interna y externa](92-glosario.qmd#gl-validez)
+:::
+
+::: {.callout-tip appearance="simple" icon="false"}
+## Descargas
+[Datos del libro (CSV)](datos/estudio.csv){.btn .btn-outline-primary .btn-sm download="estudio.csv"}
+[Plantilla de entrega del reto (.qmd)](plantillas/entrega_reto.qmd){.btn .btn-outline-primary .btn-sm download="entrega_reto.qmd"}
+[Tema de estilo (.scss)](plantillas/informe.scss){.btn .btn-outline-primary .btn-sm download="informe.scss"}
+:::
+
+## Lectura obligatoria
+
+::: {.lectura}
+Leek, J. T.; Peng, R. D. (2015). [What is the question?](https://doi.org/10.1126/science.aaa6146) *Science*, 347(6228), 1314-1315.
+:::
+
+## 1. Primero, la pregunta
+
+Leek y Peng (2015) sostienen que el error estadístico más frecuente no es de cálculo, sino de **pregunta**: usar un análisis que responde a una pregunta distinta de la que se quería responder. Proponen seis tipos:
+
+| Tipo | Pregunta | Ejemplo |
+|---|---|---|
+| **Descriptiva** | ¿Cómo son estos datos? | ¿Cuántas horas estudian, de media, los doctorandos de la muestra? |
+| **Exploratoria** | ¿Qué patrones aparecen? | ¿Parece que quienes duermen más sacan mejor nota? |
+| **Inferencial** | ¿Se mantiene el patrón en la población? | ¿Existe esa relación en todos los doctorandos de la universidad? |
+| **Predictiva** | ¿Puedo predecir un valor para alguien nuevo? | ¿Qué nota sacará una persona que estudia 20 horas? |
+| **Causal** | ¿Qué pasa si cambio una variable? | ¿Mejora la nota una tutoría semanal? |
+| **Mecanicista** | ¿Por qué ocurre, paso a paso? | ¿Por qué vía actúa la tutoría: más horas, menos ansiedad…? |
+
+Cada tipo exige más que el anterior. Una correlación responde a una pregunta exploratoria o inferencial, no a una causal.
+
+## 2. Variables y escalas
+
+| Tipo | Valores | Ejemplos en nuestros datos | Resúmenes típicos |
+|---|---|---|---|
+| **Categórica nominal** | Categorías sin orden | `grupo` (tutoría, control) | Frecuencias, proporciones |
+| **Categórica ordinal** | Categorías con orden | Nivel de acuerdo de 1 a 5 | Mediana, percentiles |
+| **Cuantitativa discreta** | Recuentos | Número de artículos publicados | Media, mediana |
+| **Cuantitativa continua** | Cualquier valor en un intervalo | `horas`, `sueno`, `nota` | Media, desviación típica, cuantiles |
+
+```{webr}
+#| autorun: true
+d <- read.csv("datos/estudio.csv")
+str(d)
+table(d$grupo)
+```
+
+## 3. Diseños: quién decide quién recibe qué
+
+- En un **estudio observacional**, el investigador mide lo que ocurre sin intervenir. Puede describir y encontrar asociaciones, pero las **variables de confusión** (factores que influyen a la vez en la supuesta causa y en el efecto) amenazan cualquier conclusión causal.
+- En un **experimento aleatorizado**, el azar decide quién recibe el tratamiento. Si la muestra es suficiente, la aleatorización equilibra en promedio las variables de confusión, **medidas y no medidas**: por eso permite inferir causas.
+- Entre ambos están los **cuasiexperimentos** (diferencias en diferencias, regresión discontinua, variables instrumentales), que aprovechan situaciones naturales para aproximarse a una comparación justa.
+
+::: {.callout-important appearance="simple"}
+## En nuestros datos
+`grupo` se asignó **al azar** (es un experimento simulado), así que la diferencia entre grupos estima el efecto causal de la tutoría. En cambio, `horas`, `sueno` y `ansiedad` se **observaron**: su relación con la nota es una asociación, que puede deberse a confusores (por ejemplo, la motivación).
+:::
+
+## 4. Validez: interna y externa
+
+La **validez interna** pregunta si la conclusión es correcta para la muestra estudiada (¿hay confusión, sesgo de medida, abandonos?). La **validez externa** pregunta si se puede generalizar a otras personas, contextos o momentos. Una muestra de doctorandos de una sola universidad puede tener buena validez interna y una validez externa limitada.
+
+### Ejercicio 1.1 {.unnumbered}
+
+¿Qué proporción del grupo de tutoría tiene una nota de 5 o más? Completa el código.
+
+```{webr}
+#| exercise: c1_prop
+#| setup: true
+d <- read.csv("datos/estudio.csv")
+```
+
+```{webr}
+#| exercise: c1_prop
+tut <- d[d$grupo == "______", ]
+mean(tut$nota >= 5)
+```
+
+::: {.hint exercise="c1_prop"}
+El grupo se llama `tutoria` (sin tilde).
+:::
+
+::: {.solution exercise="c1_prop"}
+```r
+tut <- d[d$grupo == "tutoria", ]
+mean(tut$nota >= 5)
+```
+La media de un vector lógico es la proporción de `TRUE`. Es una pregunta **descriptiva** sobre la muestra.
+:::
+
+```{webr}
+#| exercise: c1_prop
+#| check: true
+esperado <- mean(read.csv("datos/estudio.csv")$nota[read.csv("datos/estudio.csv")$grupo == "tutoria"] >= 5)
+if (isTRUE(all.equal(as.numeric(.result), esperado))) list(correct = TRUE, message = paste0("Correcto: ", round(100 * esperado), " % aprueba en el grupo de tutoría.")) else
+  list(correct = FALSE, message = "Filtra con d$grupo == \"tutoria\".")
+```
+
+## Actividades
+
+::: {.clasificar #ia-c1-pregunta titulo="¿Qué tipo de pregunta es?" categorias="Descriptiva|Exploratoria|Inferencial|Predictiva|Causal|Mecanicista"}
+- ¿Cuál es la nota media de los 120 participantes? → Descriptiva
+- ¿Qué variables parecen relacionadas con la nota? → Exploratoria
+- ¿La relación entre horas y nota se da en la población de doctorandos? → Inferencial
+- ¿Qué nota sacará un nuevo doctorando según sus horas y su sueño? → Predictiva
+- ¿La tutoría hace que suba la nota? → Causal
+- ¿La tutoría mejora la nota porque reduce la ansiedad? → Mecanicista
+:::
+
+::: {.clasificar #ia-c1-variable titulo="¿Qué tipo de variable es?" categorias="Nominal|Ordinal|Discreta|Continua"}
+- Universidad de procedencia → Nominal
+- Satisfacción con la dirección de tesis (de 1 a 5) → Ordinal
+- Número de artículos publicados → Discreta
+- Horas de sueño → Continua
+- Rama de conocimiento → Nominal
+- Tiempo hasta defender la tesis (en meses, con decimales) → Continua
+:::
+
+::: {.clasificar #ia-c1-diseno titulo="¿Permite concluir causalidad?" categorias="Sí, en principio|No, solo asociación"}
+- Se sortea qué doctorandos reciben tutoría y se comparan las notas → Sí, en principio
+- Se comparan las notas de quienes eligieron ir a tutoría con quienes no → No, solo asociación // Autoselección: quienes eligen ir pueden estar más motivados.
+- Se encuesta a 2000 doctorandos sobre su sueño y su productividad → No, solo asociación
+- Se asigna al azar el orden de presentación de dos cuestionarios → Sí, en principio
+:::
+
+## Reto evaluable {#reto-c1}
+
+::: {.callout-important appearance="simple" icon="false"}
+## Reto del capítulo 1 · La pregunta de tu tesis
+1. Escribe la pregunta principal de un estudio de tu tesis y clasifícala con la tipología de Leek y Peng.
+2. Haz una **tabla de variables**: nombre, tipo, cómo se mide y su papel (resultado, exposición, covariable).
+3. Dibuja un **diagrama causal** sencillo (con flechas) con al menos dos posibles confusores.
+4. Justifica qué diseño puede responder a tu pregunta y qué limitaciones de validez interna y externa tendrá.
+
+**Entrega:** con la [plantilla de entrega](plantillas/entrega_reto.qmd). Este reto **no tiene solución en el libro**.
+:::
+
+## Autoevaluación
+
+Responde a todas las preguntas y pulsa **Mostrar respuestas**. No cuenta para la nota.
+
+::: {.webex-check .webex-box}
+1. Una correlación entre horas de sueño y nota demuestra que dormir más mejora la nota. {{< torf false >}}
+2. Una variable que influye a la vez en la supuesta causa y en el efecto se llama variable de {{< fitb "confusión" "confusion" ignorecase=true >}}
+3. La aleatorización equilibra, en promedio, los confusores {{< mcq "solo medidos" "*medidos y no medidos" "solo no medidos" >}}
+4. El nivel de acuerdo de 1 a 5 es una variable {{< mcq "nominal" "*ordinal" "continua" >}}
+5. Generalizar los resultados a otras universidades es una cuestión de validez {{< mcq "interna" "*externa" >}}
+6. Según Leek y Peng, el error más frecuente es responder con el análisis a una pregunta distinta de la planteada. {{< torf true >}}
+7. En `mean(x >= 5)`, el resultado es {{< mcq "la media de x" "*la proporción de valores mayores o iguales que 5" "el número de valores mayores que 5" >}}
+8. ¿Qué tipo de pregunta exige más del diseño?
+
+{{< longmcq "Descriptiva" "Exploratoria" "*Causal o mecanicista" >}}
+:::
+
+::: {.webex-solution boton="Ver explicaciones"}
+- Puede haber confusores (motivación, salud…).
+- *Confounder*.
+- Esa es su gran ventaja.
+- Categorías ordenadas.
+- Externa: generalización.
+- *What is the question?*
+- Media de un lógico = proporción.
+- Hacen falta diseños que controlen la confusión.
+:::

@@ -1,0 +1,79 @@
+---
+engine: markdown
+---
+
+# Chuleta de R {#sec-chuleta}
+
+Todas las funciones que usa el libro, agrupadas por tarea.
+
+## Datos
+
+| Tarea | Código |
+|---|---|
+| Leer un CSV | `d <- read.csv("datos/estudio.csv")` |
+| Ver la estructura | `str(d)`, `head(d)`, `summary(d)` |
+| Una columna | `d$nota` |
+| Filtrar filas | `d[d$grupo == "tutoria", ]` |
+| Crear una columna | `d$horas_c <- d$horas - mean(d$horas)` |
+| Frecuencias | `table(d$grupo)` |
+
+## Describir
+
+| Tarea | Código |
+|---|---|
+| Media, mediana | `mean(x)`, `median(x)` |
+| Desviación típica, IQR | `sd(x)`, `IQR(x)` |
+| Cuantiles | `quantile(x, c(0.25, 0.5, 0.75))` |
+| Resumen por grupo | `tapply(d$nota, d$grupo, mean)` |
+| Proporción que cumple algo | `mean(x >= 5)` |
+| Correlación | `cor(x, y)` |
+
+## Gráficos
+
+| Tarea | Código |
+|---|---|
+| Puntos por grupo | `stripchart(y ~ g, data = d, vertical = TRUE, method = "jitter")` |
+| Caja | `boxplot(y ~ g, data = d)` |
+| Dispersión | `plot(x, y)` |
+| Histograma | `hist(x)` |
+| Recta de regresión | `abline(lm(y ~ x))` |
+
+## Inferencia
+
+| Tarea | Código |
+|---|---|
+| IC de una media | `t.test(x)$conf.int` |
+| Dos grupos | `t.test(y ~ g, data = d)` |
+| Emparejado | `t.test(a, b, paired = TRUE)` |
+| No paramétrico | `wilcox.test(y ~ g, data = d)` |
+| Correlación con IC | `cor.test(x, y)` |
+| Tabla de contingencia | `chisq.test(table(a, b))` |
+| Corregir comparaciones múltiples | `p.adjust(p, method = "holm")` |
+| Bootstrap | `replicate(2000, median(sample(x, replace = TRUE)))` |
+
+## Efecto y potencia
+
+| Tarea | Código |
+|---|---|
+| Potencia de un estudio | `power.t.test(n = 60, delta = 0.4, sd = 1.3)` |
+| Muestra necesaria | `power.t.test(delta = 0.4, sd = 1.3, power = 0.8)` |
+| d de Cohen | `(mean(a) - mean(b)) / sqrt((var(a) + var(b)) / 2)` |
+
+## Modelos
+
+| Tarea | Código |
+|---|---|
+| Regresión | `m <- lm(y ~ x1 + x2, data = d)` |
+| Coeficientes e IC | `summary(m)$coefficients`, `confint(m)` |
+| R² | `summary(m)$r.squared` |
+| Predicción | `predict(m, newdata = data.frame(x1 = 20, x2 = 7))` |
+| Residuos | `resid(m)`, `fitted(m)`, `qqnorm(resid(m))` |
+| Puntos influyentes | `cooks.distance(m)` |
+
+## Bayes (proporción)
+
+| Tarea | Código |
+|---|---|
+| Posterior Beta | `Beta(a + k, b + n - k)` |
+| Intervalo de credibilidad | `qbeta(c(0.025, 0.975), a + k, b + n - k)` |
+| Densidad | `curve(dbeta(x, a + k, b + n - k), 0, 1)` |

@@ -1,0 +1,32 @@
+---
+engine: markdown
+---
+
+# Presentación {.unnumbered}
+
+Casi todas las tesis acaban necesitando estadística, y casi todos los errores estadísticos publicados se deben a lo mismo: confundir lo que dicen los datos con lo que queremos que digan. Este libro no es un recetario de pruebas. Enseña a **pensar con datos**: formular bien la pregunta, describir antes de contrastar, **estimar con su incertidumbre**, interpretar un valor *p* sin mitos, planificar la muestra con la potencia y comunicar los resultados con honestidad.
+
+Todo se practica en R, en tu navegador, con un conjunto de datos simulado de 120 doctorandos ficticios (horas de estudio, sueño, ansiedad y nota en un examen de métodos) y con laboratorios que simulan miles de estudios para que veas cómo se comportan los métodos.
+
+::: {.callout-note appearance="simple" icon="false"}
+## Cómo citar este libro
+> Sánchez-Núñez, P. (2026). *Estadística para la investigación: pensar con datos, estimar con incertidumbre y comunicar con honestidad*. Universidad Carlos III de Madrid. Zenodo.
+
+**Autor:** Pablo Sánchez-Núñez ([ORCID 0000-0001-7845-9506](https://orcid.org/0000-0001-7845-9506)), Universidad Carlos III de Madrid. Texto bajo licencia [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.es).
+:::
+
+## Mapa del libro
+
+| Capítulo | Pregunta |
+|---|---|
+| [1. Pensar con datos](01-pensar.qmd) | ¿Qué pregunta hago y qué diseño puede responderla? |
+| [2. Describir y visualizar](02-describir.qmd) | ¿Cómo son mis datos antes de cualquier prueba? |
+| [3. Estimar con incertidumbre](03-estimar.qmd) | ¿Qué rango de valores es compatible con mis datos? |
+| [4. Contrastes y valores *p*](04-contrastes.qmd) | ¿Qué dice (y qué no) un valor *p*? |
+| [5. Tamaño del efecto y potencia](05-efecto-potencia.qmd) | ¿Cuánto importa el efecto y cuántos datos necesito? |
+| [6. Regresión](06-regresion.qmd) | ¿Cómo se relacionan varias variables a la vez? |
+| [7. Introducción a la inferencia bayesiana](07-bayes.qmd) | ¿Cómo actualizar lo que sabía con lo que observo? |
+
+Si nunca has usado R, empieza por [Usar R en este libro](00-r-en-el-libro.qmd); el apéndice [Chuleta de R](90-chuleta.qmd) reúne todas las funciones del libro.
+
+Tu progreso se guarda solo en tu navegador. El libro funciona sin conexión una vez visitado.

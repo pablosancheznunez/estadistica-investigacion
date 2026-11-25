@@ -1,0 +1,234 @@
+---
+engine: markdown
+---
+
+# Capítulo 7. Introducción a la inferencia bayesiana {#sec-cap7}
+
+::: {.callout-note appearance="default"}
+## Objetivos
+- Entender la lógica bayesiana: distribución previa, verosimilitud y distribución posterior.
+- Calcular e interpretar una posterior y un intervalo de credibilidad en un caso sencillo.
+- Conocer el factor de Bayes y cuándo conviene el enfoque bayesiano.
+:::
+
+::: {.callout-note appearance="simple" icon="false"}
+## Glosario del capítulo
+[Distribución previa](92-glosario.qmd#gl-previa) · [Verosimilitud](92-glosario.qmd#gl-verosimilitud) · [Distribución posterior](92-glosario.qmd#gl-posterior) · [Intervalo de credibilidad](92-glosario.qmd#gl-credibilidad) · [Factor de Bayes](92-glosario.qmd#gl-bf)
+:::
+
+::: {.callout-tip appearance="simple" icon="false"}
+## Descargas
+[Script R del capítulo](plantillas/07_bayes.R){.btn .btn-outline-primary .btn-sm download="07_bayes.R"}
+[Plantilla de entrega del reto (.qmd)](plantillas/entrega_reto.qmd){.btn .btn-outline-primary .btn-sm download="entrega_reto.qmd"}
+:::
+
+## Lectura obligatoria
+
+::: {.lectura}
+Kruschke, J. K.; Liddell, T. M. (2018). [The Bayesian new statistics: Hypothesis testing, estimation, meta-analysis, and power analysis from a Bayesian perspective](https://doi.org/10.3758/s13423-016-1221-4). *Psychonomic Bulletin & Review*, 25(1), 178-206.
+:::
+
+### Lecturas complementarias {.unnumbered}
+
+- Wagenmakers, E.-J.; Marsman, M.; Jamil, T.; Ly, A.; Verhagen, J.; Love, J. et al. (2018). [Bayesian inference for psychology. Part I: Theoretical advantages and practical ramifications](https://doi.org/10.3758/s13423-017-1343-3). *Psychonomic Bulletin & Review*, 25(1), 35-57.
+
+## 1. Probabilidad como grado de creencia
+
+En la estadística frecuentista, la probabilidad describe frecuencias a largo plazo y los parámetros son fijos. En la **bayesiana**, la probabilidad expresa **incertidumbre sobre los parámetros**, y se actualiza con los datos mediante el teorema de Bayes:
+
+::: {style="text-align:center;font-size:1.1em"}
+posterior ∝ verosimilitud × previa
+:::
+
+- La **distribución previa** recoge lo que se sabía (o se supone) antes de los datos.
+- La **verosimilitud** dice qué valores del parámetro hacen más probables los datos observados.
+- La **distribución posterior** combina ambas: es lo que se sabe después.
+
+Su gran ventaja es responder directamente a la pregunta que solemos querer: ¿qué valores del parámetro son **creíbles** dados los datos? Su gran exigencia es explicitar y justificar la previa.
+
+## 2. Un caso que se calcula a mano: una proporción
+
+Queremos estimar la proporción de doctorandos que aprueban un examen. Con una previa **Beta(a, b)** y *k* aprobados de *n*, la posterior es **Beta(a + k, b + n − k)**. La previa Beta(1, 1) es plana: todos los valores entre 0 y 1 igual de creíbles.
+
+```{webr}
+#| autorun: true
+#| fig-height: 3.8
+d <- read.csv("datos/estudio.csv")
+k <- sum(d$nota >= 5); n <- nrow(d)
+a <- 1; b <- 1                                  # previa plana
+qbeta(c(0.025, 0.975), a + k, b + n - k)       # intervalo de credibilidad del 95 %
+curve(dbeta(x, a + k, b + n - k), 0.5, 1, col = "#2a78d6", lwd = 2, xlab = "Proporción de aprobados", ylab = "Densidad")
+curve(dbeta(x, a, b), add = TRUE, col = "grey50", lty = 2)
+```
+
+El **intervalo de credibilidad** del 95 % sí admite la lectura intuitiva: dada la previa y los datos, hay un 95 % de probabilidad de que la proporción esté entre esos valores.
+
+## Laboratorio: actualizar con los datos {#lab-c7-beta}
+
+::: {.laboratorio}
+::: {.laboratorio-etiqueta}
+Laboratorio · cálculo en tu navegador
+:::
+
+Elige una previa (su media y cuánta información aporta, en «observaciones equivalentes») y unos datos. Mira cómo la posterior se desplaza desde la previa hacia los datos y cómo los datos dominan cuando son abundantes.
+
+```{ojs}
+//| echo: false
+rango = window.Lab.rango
+viewof b_media = rango("Media de la previa", [0.05, 0.95], {step: 0.05, value: 0.5, formato: x => x.toFixed(2).replace(".", ",")})
+viewof b_peso = rango("Peso de la previa (observaciones equivalentes)", [2, 200], {step: 2, value: 2})
+viewof b_n = rango("Observaciones (n)", [0, 200], {step: 1, value: 20})
+viewof b_k = rango("Éxitos observados", [0, 200], {step: 1, value: 15})
+```
+
+```{ojs}
+//| echo: false
+{
+  const n = b_n, k = Math.min(b_k, b_n), a = b_media * b_peso, b = (1 - b_media) * b_peso;
+  const lgamma = z => { const c = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5];
+    let x = z, y = z, t = x + 5.5; t -= (x + 0.5) * Math.log(t); let s = 1.000000000190015; for (const ci of c) s += ci / ++y; return -t + Math.log(2.5066282746310005 * s / x); };
+  const dbeta = (x, p, q) => x <= 0 || x >= 1 ? 0 : Math.exp((p - 1) * Math.log(x) + (q - 1) * Math.log(1 - x) - (lgamma(p) + lgamma(q) - lgamma(p + q)));
+  const xs = Array.from({length: 199}, (_, i) => (i + 1) / 200);
+  const prev = xs.map(x => dbeta(x, a, b)), post = xs.map(x => dbeta(x, a + k, b + n - k)), ver = xs.map(x => n ? Math.exp(k * Math.log(x) + (n - k) * Math.log(1 - x)) : 1);
+  const norm = v => { const m = Math.max(...v.filter(Number.isFinite)); return v.map(y => y / m); };
+  const X = x => 20 + x * 440, Y = y => 170 - y * 150;
+  const linea = (v, c, ds) => `<polyline points="${norm(v).map((y, i) => `${X(xs[i])},${Y(y)}`).join(" ")}" fill="none" stroke="${c}" stroke-width="2.2" ${ds ? `stroke-dasharray="${ds}"` : ""}/>`;
+  const pa = a + k, pb = b + n - k, media = pa / (pa + pb);
+  const cdf = []; let acc = 0; post.forEach(p => { acc += p; cdf.push(acc); }); const tot = acc;
+  const q = p => xs[cdf.findIndex(c => c / tot >= p)];
+  const f = v => v.toFixed(2).replace(".", ",");
+  const d = html`<div role="status"></div>`;
+  d.innerHTML = `<p>Posterior: Beta(${f(pa)}; ${f(pb)}) · media <strong>${f(media)}</strong> · intervalo de credibilidad del 95 % ≈ [${f(q(.025))}; ${f(q(.975))}]</p>
+   <svg viewBox="0 0 480 190" width="100%" style="max-width:480px" role="img" aria-label="Curvas de la previa, la verosimilitud y la posterior">
+   <line x1="20" x2="460" y1="170" y2="170" stroke="currentColor" stroke-opacity=".4"/>
+   ${linea(prev, "#8a8984", "5 4")}${n ? linea(ver, "#1baf7a", "2 3") : ""}${linea(post, "#2a78d6")}
+   <text x="20" y="186" font-size="10" fill="currentColor">0</text><text x="460" y="186" font-size="10" text-anchor="end" fill="currentColor">1</text></svg>
+   <p class="small">Gris discontinua: previa · verde punteada: verosimilitud (los datos) · azul: posterior. Curvas reescaladas a la misma altura. ${b_k > b_n ? "Hay más éxitos que observaciones: se usa k = n." : ""}</p>`;
+  return d;
+}
+```
+:::
+
+## 3. Contrastar hipótesis: el factor de Bayes
+
+El **factor de Bayes** (BF₁₀) compara cuánto mejor predicen los datos una hipótesis (H₁) que otra (H₀). Un BF₁₀ = 6 significa que los datos son seis veces más probables bajo H₁ que bajo H₀. A diferencia del valor *p*, puede aportar evidencia **a favor** de la hipótesis nula. Depende, eso sí, de cómo se defina la previa de H₁.
+
+## 4. ¿Cuándo usar el enfoque bayesiano?
+
+- Cuando hay **información previa** legítima que conviene incorporar.
+- Con **muestras pequeñas** o modelos complejos (multinivel), donde las previas estabilizan las estimaciones.
+- Cuando se quiere cuantificar la evidencia **a favor de la nula**.
+- Cuando se quiere hablar en términos de **probabilidad de los parámetros**.
+
+En R, paquetes como **brms** o **rstanarm** ajustan modelos bayesianos con una sintaxis parecida a `lm()`, y **BayesFactor** calcula factores de Bayes. Fuera del navegador, son el siguiente paso natural tras este capítulo.
+
+### Ejercicio 7.1 {.unnumbered}
+
+Con una previa Beta(1, 1) y 15 aprobados de 20, calcula la **media de la posterior**: (a + k) / (a + b + n).
+
+```{webr}
+#| exercise: c7_media
+a <- 1; b <- 1; k <- 15; n <- 20
+(a + k) / (a + b + ______)
+```
+
+::: {.hint exercise="c7_media"}
+El denominador suma a, b y el número de observaciones n.
+:::
+
+::: {.solution exercise="c7_media"}
+```r
+a <- 1; b <- 1; k <- 15; n <- 20
+(a + k) / (a + b + n)
+```
+0,727: un poco por debajo de la proporción observada (0,75), atraída hacia la media de la previa (0,5).
+:::
+
+```{webr}
+#| exercise: c7_media
+#| check: true
+if (isTRUE(all.equal(as.numeric(.result), 16 / 22))) list(correct = TRUE, message = "Correcto: 16 / 22 ≈ 0,727.") else
+  list(correct = FALSE, message = "Suma n en el denominador.")
+```
+
+### Ejercicio 7.2 {.unnumbered}
+
+Calcula el intervalo de credibilidad del 95 % de esa posterior, Beta(16, 6).
+
+```{webr}
+#| exercise: c7_ic
+qbeta(c(0.025, ______), 16, 6)
+```
+
+::: {.hint exercise="c7_ic"}
+El límite superior es el cuantil 0,975.
+:::
+
+::: {.solution exercise="c7_ic"}
+```r
+qbeta(c(0.025, 0.975), 16, 6)
+```
+:::
+
+```{webr}
+#| exercise: c7_ic
+#| check: true
+if (isTRUE(all.equal(as.numeric(.result), qbeta(c(0.025, 0.975), 16, 6)))) list(correct = TRUE, message = "Correcto.") else
+  list(correct = FALSE, message = "Usa 0.975.")
+```
+
+## Actividades
+
+::: {.clasificar #ia-c7-concepto titulo="¿De qué concepto se trata?" categorias="Previa|Verosimilitud|Posterior|Factor de Bayes"}
+- Lo que se sabía de la tasa de aprobados antes de este curso → Previa
+- Cómo de probables son los datos observados para cada valor del parámetro → Verosimilitud
+- La distribución de la tasa de aprobados una vez vistos los datos → Posterior
+- Los datos son 8 veces más probables si la tutoría tiene efecto que si no → Factor de Bayes
+:::
+
+::: {.clasificar #ia-c7-frase titulo="¿Frecuentista o bayesiana?" categorias="Frecuentista|Bayesiana"}
+- «El 95 % de los intervalos calculados así contendría el valor verdadero» → Frecuentista
+- «Hay un 95 % de probabilidad de que el parámetro esté entre 0,6 y 0,8» → Bayesiana
+- «Si la hipótesis nula fuera cierta, datos así aparecerían un 3 % de las veces» → Frecuentista
+- «Los datos apoyan la hipótesis nula frente a la alternativa con un factor de 5» → Bayesiana
+:::
+
+## Reto evaluable {#reto-c7}
+
+::: {.callout-important appearance="simple" icon="false"}
+## Reto del capítulo 7 · Dos lecturas de los mismos datos
+1. Elige un resultado de tu tesis o de un artículo con una proporción o una diferencia de medias.
+2. Analízalo de forma **frecuentista** (intervalo y valor *p*) y **bayesiana** (posterior e intervalo de credibilidad) con al menos dos previas distintas: una poco informativa y otra informativa justificada.
+3. Compara las conclusiones y discute la sensibilidad a la previa.
+4. Explica, para un público no especialista, qué significa cada intervalo.
+
+**Entrega:** con la [plantilla de entrega](plantillas/entrega_reto.qmd). Este reto **no tiene solución en el libro**.
+:::
+
+## Autoevaluación
+
+Responde a todas las preguntas y pulsa **Mostrar respuestas**. No cuenta para la nota.
+
+::: {.webex-check .webex-box}
+1. En la inferencia bayesiana, la posterior es proporcional a la verosimilitud por la {{< fitb "previa" ignorecase=true >}}
+2. Con previa Beta(1, 1) y 15 éxitos de 20, la posterior es {{< mcq "Beta(15, 5)" "*Beta(16, 6)" "Beta(1, 1)" >}}
+3. El intervalo de credibilidad admite la lectura «hay un 95 % de probabilidad de que el parámetro esté aquí». {{< torf true >}}
+4. Un factor de Bayes puede aportar evidencia a favor de la hipótesis nula. {{< torf true >}}
+5. Con muchos datos, la posterior depende sobre todo de {{< mcq "la previa" "*los datos" "el investigador" >}}
+6. Un paquete de R para ajustar modelos bayesianos con sintaxis parecida a `lm()` es {{< mcq "ggplot2" "*brms" "dplyr" >}}
+7. El enfoque bayesiano no necesita justificar ninguna decisión. {{< torf false >}}
+8. ¿Qué hace la previa con una muestra pequeña?
+
+{{< longmcq "No tiene ningún efecto" "*Atrae la estimación hacia sus valores y la estabiliza" "Hace que el intervalo sea infinito" >}}
+:::
+
+::: {.webex-solution boton="Ver explicaciones"}
+- Teorema de Bayes.
+- a + k = 16; b + n − k = 6.
+- Esa es su ventaja interpretativa.
+- A diferencia del valor *p*.
+- Los datos dominan cuando abundan.
+- *Bayesian regression models using Stan*.
+- La previa debe justificarse y analizarse su sensibilidad.
+- Efecto de contracción (*shrinkage*).
+:::

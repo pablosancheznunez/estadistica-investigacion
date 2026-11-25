@@ -1,0 +1,242 @@
+---
+engine: markdown
+---
+
+# Capítulo 4. Contrastes y valores *p* {#sec-cap4}
+
+::: {.callout-note appearance="default"}
+## Objetivos
+- Entender la lógica del contraste de hipótesis y lo que significa un valor *p*.
+- Reconocer y evitar las interpretaciones erróneas más frecuentes.
+- Elegir y aplicar los contrastes básicos en R, comprobando sus supuestos.
+:::
+
+::: {.callout-note appearance="simple" icon="false"}
+## Glosario del capítulo
+[Hipótesis nula](92-glosario.qmd#gl-nula) · [Valor *p*](92-glosario.qmd#gl-p) · [Nivel de significación](92-glosario.qmd#gl-alfa) · [Error de tipo I y II](92-glosario.qmd#gl-errores) · [Prueba t](92-glosario.qmd#gl-t) · [Comparaciones múltiples](92-glosario.qmd#gl-multiples)
+:::
+
+::: {.callout-tip appearance="simple" icon="false"}
+## Descargas
+[Script R del capítulo](plantillas/04_contrastes.R){.btn .btn-outline-primary .btn-sm download="04_contrastes.R"}
+[Plantilla de entrega del reto (.qmd)](plantillas/entrega_reto.qmd){.btn .btn-outline-primary .btn-sm download="entrega_reto.qmd"}
+:::
+
+## Lectura obligatoria
+
+::: {.lectura}
+Wasserstein, R. L.; Lazar, N. A. (2016). [The ASA statement on *p*-values: Context, process, and purpose](https://doi.org/10.1080/00031305.2016.1154108). *The American Statistician*, 70(2), 129-133.
+:::
+
+### Lecturas complementarias {.unnumbered}
+
+- Greenland, S.; Senn, S. J.; Rothman, K. J.; Carlin, J. B.; Poole, C.; Goodman, S. N.; Altman, D. G. (2016). [Statistical tests, *P* values, confidence intervals, and power: A guide to misinterpretations](https://doi.org/10.1007/s10654-016-0149-3). *European Journal of Epidemiology*, 31(4), 337-350.
+- Halsey, L. G.; Curran-Everett, D.; Vowler, S. L.; Drummond, G. B. (2015). [The fickle *P* value generates irreproducible results](https://doi.org/10.1038/nmeth.3288). *Nature Methods*, 12(3), 179-185.
+
+## 1. La lógica del contraste
+
+1. Se plantea una **hipótesis nula** (H₀), normalmente «no hay efecto» o «no hay diferencia».
+2. Se calcula un estadístico que mide cuánto se alejan los datos de lo que predice H₀.
+3. El **valor *p*** es la probabilidad de obtener un estadístico **tan extremo o más** que el observado **si H₀ y todos los supuestos del modelo fueran ciertos**.
+4. Si *p* es menor que un umbral α fijado de antemano (por convención, 0,05), se rechaza H₀.
+
+Este procedimiento controla a largo plazo dos errores: el de **tipo I** (rechazar H₀ cuando es cierta, con probabilidad α) y el de **tipo II** (no rechazarla cuando es falsa, con probabilidad β; la potencia es 1 − β, capítulo 5).
+
+## 2. Seis principios de la ASA
+
+En 2016, la American Statistical Association publicó por primera vez una declaración sobre un procedimiento concreto (Wasserstein y Lazar, 2016):
+
+1. Los valores *p* pueden indicar cuán incompatibles son los datos con un modelo estadístico concreto.
+2. **No miden** la probabilidad de que la hipótesis sea cierta, ni la de que los datos se deban solo al azar.
+3. Las conclusiones científicas y las decisiones no deberían basarse solo en si *p* supera un umbral.
+4. Una inferencia correcta exige **informar de todo** con transparencia.
+5. Un valor *p* **no mide el tamaño del efecto** ni la importancia del resultado.
+6. Por sí solo, un valor *p* no es una buena medida de la evidencia sobre un modelo o una hipótesis.
+
+## 3. Laboratorio: ¿cómo se distribuyen los valores *p*? {#lab-c4-p}
+
+::: {.laboratorio}
+::: {.laboratorio-etiqueta}
+Laboratorio · simulación en tu navegador
+:::
+
+Simulamos 2000 estudios con dos grupos. Si **no hay efecto**, los valores *p* se reparten de manera **uniforme** entre 0 y 1: un 5 % cae por debajo de 0,05 por puro azar. Si **hay efecto**, se amontonan cerca de 0, tanto más cuanto mayor es la potencia.
+
+```{ojs}
+//| echo: false
+rango = window.Lab.rango
+viewof p_d = rango("Tamaño del efecto real (d de Cohen)", [0, 1], {step: 0.05, value: 0, formato: x => x.toFixed(2).replace(".", ",")})
+viewof p_n = rango("Personas por grupo", [5, 100], {step: 5, value: 20})
+```
+
+```{ojs}
+//| echo: false
+{
+  let s = 3; const u = () => (s = (s * 16807) % 2147483647) / 2147483647;
+  const nrm = () => Math.sqrt(-2 * Math.log(u())) * Math.cos(2 * Math.PI * u());
+  const Phi = z => { const t = 1 / (1 + 0.2316419 * Math.abs(z)), d = 0.3989423 * Math.exp(-z * z / 2);
+    const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return z > 0 ? 1 - p : p; };
+  const ps = Array.from({length: 2000}, () => { let a = 0, b = 0; for (let i = 0; i < p_n; i++) { a += nrm(); b += nrm() + p_d; }
+    const z = (b / p_n - a / p_n) / Math.sqrt(2 / p_n); return 2 * (1 - Phi(Math.abs(z))); });
+  const bins = Array(20).fill(0); ps.forEach(p => bins[Math.min(19, Math.floor(p * 20))]++);
+  const max = Math.max(...bins), sig = ps.filter(p => p < 0.05).length / 2000;
+  const barras = bins.map((v, i) => `<rect x="${30 + i * 22}" y="${180 - 160 * v / max}" width="20" height="${160 * v / max}" fill="${i === 0 ? "#eb6834" : "#2a78d6"}"/>`).join("");
+  const d = html`<div role="status"></div>`;
+  d.innerHTML = `<p><strong>${(100 * sig).toFixed(1).replace(".", ",")} %</strong> de los estudios obtiene <em>p</em> &lt; 0,05 ${p_d === 0 ? "(todos son falsos positivos)" : "(es la potencia, aproximadamente)"}.</p>
+   <svg viewBox="0 0 480 205" width="100%" style="max-width:480px" role="img" aria-label="Histograma de 2000 valores p entre 0 y 1">${barras}
+   <line x1="30" x2="470" y1="180" y2="180" stroke="currentColor" stroke-opacity=".4"/>
+   <text x="30" y="198" font-size="10" fill="currentColor">0</text><text x="250" y="198" font-size="10" text-anchor="middle" fill="currentColor">0,5</text><text x="470" y="198" font-size="10" text-anchor="end" fill="currentColor">1</text></svg>
+   <p class="small">En naranja, la barra de <em>p</em> &lt; 0,05. Prueba d = 0,5 con 20 por grupo y después con 80: el mismo efecto, valores <em>p</em> muy distintos de un estudio a otro.</p>`;
+  return d;
+}
+```
+:::
+
+## 4. Contrastes básicos en R
+
+| Pregunta | Datos | Contraste | En R |
+|---|---|---|---|
+| ¿Difieren dos medias? | Dos grupos independientes | *t* de Welch | `t.test(y ~ grupo)` |
+| ¿Cambia una medida antes y después? | Medidas emparejadas | *t* emparejada | `t.test(antes, despues, paired = TRUE)` |
+| ¿Difieren dos distribuciones sin suponer normalidad? | Dos grupos | Wilcoxon-Mann-Whitney | `wilcox.test(y ~ grupo)` |
+| ¿Difieren varias medias? | Tres o más grupos | ANOVA | `aov(y ~ grupo)` |
+| ¿Están asociadas dos variables categóricas? | Tabla de frecuencias | Ji cuadrado | `chisq.test(tabla)` |
+| ¿Hay relación lineal? | Dos cuantitativas | Correlación | `cor.test(x, y)` |
+
+```{webr}
+#| autorun: true
+d <- read.csv("datos/estudio.csv")
+t.test(nota ~ grupo, data = d)
+```
+
+La salida da el estadístico *t*, los grados de libertad, el valor *p*, el **intervalo de confianza de la diferencia** y las medias. Lee primero el intervalo: la tutoría podría mejorar la nota en casi un punto o empeorarla ligeramente; los datos son compatibles con un efecto nulo, pero también con uno moderado. «No significativo» **no** es «no hay efecto».
+
+## 5. Muchas pruebas, muchos falsos positivos
+
+Con 20 contrastes independientes y α = 0,05, la probabilidad de al menos un falso positivo es 1 − 0,95²⁰ ≈ 64 %. Las correcciones (Bonferroni, Holm, tasa de falsos descubrimientos) ajustan los valores *p* cuando se hacen muchas pruebas:
+
+```{webr}
+#| autorun: true
+p <- c(0.001, 0.012, 0.03, 0.04, 0.2)
+p.adjust(p, method = "holm")
+p.adjust(p, method = "BH")   # tasa de falsos descubrimientos
+```
+
+### Ejercicio 4.1 {.unnumbered}
+
+¿Está asociada la ansiedad con la nota? Calcula `cor.test()` y extrae el valor *p*.
+
+```{webr}
+#| exercise: c4_cor
+#| setup: true
+d <- read.csv("datos/estudio.csv")
+```
+
+```{webr}
+#| exercise: c4_cor
+cor.test(d$ansiedad, d$nota)$______
+```
+
+::: {.hint exercise="c4_cor"}
+El elemento con el valor *p* se llama `p.value`.
+:::
+
+::: {.solution exercise="c4_cor"}
+```r
+cor.test(d$ansiedad, d$nota)$p.value
+```
+Mira también `$conf.int`: el intervalo de la correlación dice más que el valor *p*.
+:::
+
+```{webr}
+#| exercise: c4_cor
+#| check: true
+dd <- read.csv("datos/estudio.csv")
+if (isTRUE(all.equal(as.numeric(.result), cor.test(dd$ansiedad, dd$nota)$p.value))) list(correct = TRUE, message = "Correcto: ese es el valor p.") else
+  list(correct = FALSE, message = "Escribe $p.value.")
+```
+
+### Ejercicio 4.2 {.unnumbered}
+
+Calcula la probabilidad de al menos un falso positivo al hacer **10** contrastes independientes con α = 0,05.
+
+```{webr}
+#| exercise: c4_fwer
+1 - (1 - 0.05)^______
+```
+
+::: {.hint exercise="c4_fwer"}
+El exponente es el número de contrastes.
+:::
+
+::: {.solution exercise="c4_fwer"}
+```r
+1 - (1 - 0.05)^10
+```
+Alrededor del 40 %.
+:::
+
+```{webr}
+#| exercise: c4_fwer
+#| check: true
+if (isTRUE(all.equal(as.numeric(.result), 1 - 0.95^10))) list(correct = TRUE, message = "Correcto: ≈ 40 %.") else
+  list(correct = FALSE, message = "Eleva a 10.")
+```
+
+## Actividades
+
+::: {.clasificar #ia-c4-mitos titulo="Con p = 0,03, ¿la afirmación es correcta?" categorias="Correcta|Incorrecta"}
+- Hay un 3 % de probabilidad de que la hipótesis nula sea cierta → Incorrecta // El valor p supone que H₀ es cierta; no calcula su probabilidad.
+- Si H₀ y el modelo fueran ciertos, datos tan extremos o más aparecerían un 3 % de las veces → Correcta
+- El efecto es grande e importante → Incorrecta // El valor p no mide el tamaño del efecto.
+- Hay un 97 % de probabilidad de que el resultado se replique → Incorrecta
+- Los datos son poco compatibles con la hipótesis nula, según este modelo → Correcta
+:::
+
+::: {.clasificar #ia-c4-prueba titulo="¿Qué contraste usarías?" categorias="t de Welch|t emparejada|Ji cuadrado|ANOVA|Correlación"}
+- Comparar la nota media de tutoría y control → t de Welch
+- Comparar la ansiedad de las mismas personas antes y después de un curso → t emparejada
+- Ver si el abandono (sí/no) depende de la rama (cinco ramas) → Ji cuadrado
+- Comparar la nota media de cuatro métodos de enseñanza → ANOVA
+- Ver si las horas de estudio se relacionan con la nota → Correlación
+:::
+
+## Reto evaluable {#reto-c4}
+
+::: {.callout-important appearance="simple" icon="false"}
+## Reto del capítulo 4 · Auditoría de los valores *p*
+1. Elige dos artículos de tu campo y localiza todas las afirmaciones basadas en valores *p*.
+2. Clasifícalas según los seis principios de la ASA: ¿cuáles son correctas y cuáles caen en alguno de los errores de Greenland et al. (2016)?
+3. Comprueba si informan de tamaños del efecto e intervalos y si corrigen las comparaciones múltiples.
+4. Reescribe dos conclusiones con un lenguaje correcto.
+
+**Entrega:** con la [plantilla de entrega](plantillas/entrega_reto.qmd). Este reto **no tiene solución en el libro**.
+:::
+
+## Autoevaluación
+
+Responde a todas las preguntas y pulsa **Mostrar respuestas**. No cuenta para la nota.
+
+::: {.webex-check .webex-box}
+1. El valor *p* es la probabilidad de que la hipótesis nula sea cierta. {{< torf false >}}
+2. Si no hay efecto, los valores *p* se distribuyen de forma {{< mcq "concentrada cerca de 0" "*uniforme entre 0 y 1" "concentrada cerca de 1" >}}
+3. Rechazar la hipótesis nula cuando es cierta es un error de tipo {{< mcq "*I" "II" >}}
+4. «No significativo» equivale a «no hay efecto». {{< torf false >}}
+5. Para medidas antes y después en las mismas personas se usa la prueba *t* {{< fitb "emparejada" ignorecase=true >}}
+6. Con 20 contrastes independientes y α = 0,05, la probabilidad de al menos un falso positivo es aproximadamente {{< mcq "5 %" "20 %" "*64 %" "100 %" >}}
+7. Un valor *p* pequeño indica que el efecto es grande. {{< torf false >}}
+8. ¿Qué debe leerse primero en la salida de `t.test()`?
+
+{{< longmcq "Los grados de libertad" "*El intervalo de confianza de la diferencia, que dice cuánto efecto es compatible con los datos" "El nombre del contraste" >}}
+:::
+
+::: {.webex-solution boton="Ver explicaciones"}
+- Principio 2 de la ASA.
+- Uniforme bajo H₀.
+- Tipo I: falso positivo.
+- Ausencia de evidencia no es evidencia de ausencia.
+- *Paired*.
+- 1 − 0,95²⁰ ≈ 0,64.
+- Con muestras enormes, efectos diminutos dan *p* minúsculos.
+- Estimación antes que dicotomía.
+:::

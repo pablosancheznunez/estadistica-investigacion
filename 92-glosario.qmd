@@ -1,0 +1,135 @@
+---
+engine: markdown
+---
+
+# Glosario {#sec-glosario}
+
+Términos del libro ordenados por capítulo. Cada entrada enlaza con el capítulo donde se explica.
+
+## Pensar con datos
+
+### Población y muestra {#gl-poblacion}
+La población es el conjunto sobre el que se quiere concluir; la muestra, la parte que se observa. → [Capítulo 1](01-pensar.qmd)
+
+### Variable {#gl-variable}
+Característica que toma valores distintos en las unidades estudiadas: nominal, ordinal, discreta o continua. → [Capítulo 1](01-pensar.qmd)
+
+### Estudio observacional {#gl-observacional}
+Estudio en el que se mide sin intervenir; permite describir y encontrar asociaciones. → [Capítulo 1](01-pensar.qmd)
+
+### Experimento aleatorizado {#gl-experimento}
+Estudio en el que el azar decide quién recibe cada condición; permite inferir causas. → [Capítulo 1](01-pensar.qmd)
+
+### Variable de confusión {#gl-confusion}
+Factor que influye a la vez en la supuesta causa y en el efecto, y crea asociaciones engañosas. → [Capítulo 1](01-pensar.qmd)
+
+### Validez interna y externa {#gl-validez}
+Interna: si la conclusión es correcta para la muestra. Externa: si se puede generalizar. → [Capítulo 1](01-pensar.qmd)
+
+## Describir y visualizar
+
+### Media y mediana {#gl-media}
+La media es el valor de equilibrio; la mediana, el valor central. La mediana resiste mejor los extremos. → [Capítulo 2](02-describir.qmd)
+
+### Desviación típica {#gl-desviacion}
+Distancia típica de los datos a su media. → [Capítulo 2](02-describir.qmd)
+
+### Rango intercuartílico {#gl-iqr}
+Diferencia entre los percentiles 75 y 25: amplitud del 50 % central de los datos. → [Capítulo 2](02-describir.qmd)
+
+### Valor atípico {#gl-atipico}
+Observación muy alejada del resto; hay que investigarla, no eliminarla sin justificación. → [Capítulo 2](02-describir.qmd)
+
+### Correlación {#gl-correlacion}
+Medida de la fuerza de una relación lineal entre dos variables, entre −1 y 1. → [Capítulo 2](02-describir.qmd)
+
+## Estimar con incertidumbre
+
+### Distribución muestral {#gl-muestral}
+Distribución de un estadístico si el estudio se repitiera muchas veces. → [Capítulo 3](03-estimar.qmd)
+
+### Error típico {#gl-errortipico}
+Desviación típica de la distribución muestral; para una media, aproximadamente sd/√n. → [Capítulo 3](03-estimar.qmd)
+
+### Intervalo de confianza {#gl-ic}
+Intervalo calculado con un procedimiento que, repetido, contiene el valor verdadero en un porcentaje fijado de las veces. → [Capítulo 3](03-estimar.qmd)
+
+### Estimación {#gl-estimacion}
+Cuantificación de un parámetro con su incertidumbre, en lugar de una decisión de sí o no. → [Capítulo 3](03-estimar.qmd)
+
+### Remuestreo (*bootstrap*) {#gl-bootstrap}
+Aproximación a la distribución muestral remuestreando con reemplazo los propios datos. → [Capítulo 3](03-estimar.qmd)
+
+## Contrastes y valores p
+
+### Hipótesis nula {#gl-nula}
+Hipótesis de referencia, normalmente de ausencia de efecto, frente a la que se evalúan los datos. → [Capítulo 4](04-contrastes.qmd)
+
+### Valor *p* {#gl-p}
+Probabilidad de obtener datos tan extremos o más que los observados si la hipótesis nula y el modelo fueran ciertos. → [Capítulo 4](04-contrastes.qmd)
+
+### Nivel de significación {#gl-alfa}
+Umbral α, fijado de antemano, por debajo del cual se rechaza la hipótesis nula. → [Capítulo 4](04-contrastes.qmd)
+
+### Error de tipo I y II {#gl-errores}
+Tipo I: rechazar una nula cierta (falso positivo). Tipo II: no rechazar una nula falsa (falso negativo). → [Capítulo 4](04-contrastes.qmd)
+
+### Prueba t {#gl-t}
+Contraste para comparar medias; la versión de Welch no supone varianzas iguales. → [Capítulo 4](04-contrastes.qmd)
+
+### Comparaciones múltiples {#gl-multiples}
+Problema de hacer muchos contrastes: aumenta la probabilidad de algún falso positivo. → [Capítulo 4](04-contrastes.qmd)
+
+## Tamaño del efecto y potencia
+
+### Tamaño del efecto {#gl-efecto}
+Magnitud de un fenómeno, en unidades originales o estandarizada. → [Capítulo 5](05-efecto-potencia.qmd)
+
+### d de Cohen {#gl-d}
+Diferencia de medias dividida entre la desviación típica combinada. → [Capítulo 5](05-efecto-potencia.qmd)
+
+### Potencia {#gl-potencia}
+Probabilidad de detectar un efecto de un tamaño dado si existe. → [Capítulo 5](05-efecto-potencia.qmd)
+
+### Efecto mínimo de interés {#gl-sesoi}
+Efecto más pequeño que tendría importancia teórica o práctica. → [Capítulo 5](05-efecto-potencia.qmd)
+
+### Justificación de la muestra {#gl-justificacion}
+Argumento explícito de por qué se usa un tamaño de muestra concreto. → [Capítulo 5](05-efecto-potencia.qmd)
+
+## Regresión
+
+### Regresión lineal {#gl-regresion}
+Modelo que expresa un resultado como combinación lineal de predictores más un error. → [Capítulo 6](06-regresion.qmd)
+
+### Coeficiente {#gl-coeficiente}
+Cambio esperado en el resultado por unidad de un predictor, con los demás constantes. → [Capítulo 6](06-regresion.qmd)
+
+### Residuo {#gl-residuo}
+Diferencia entre el valor observado y el predicho por el modelo. → [Capítulo 6](06-regresion.qmd)
+
+### R² {#gl-r2}
+Proporción de la variabilidad del resultado explicada por el modelo. → [Capítulo 6](06-regresion.qmd)
+
+### Variable centrada {#gl-centrar}
+Variable a la que se resta su media para que el cero sea interpretable. → [Capítulo 6](06-regresion.qmd)
+
+### Sobreajuste {#gl-sobreajuste}
+Modelo que se ajusta al ruido de la muestra y predice mal datos nuevos. → [Capítulo 6](06-regresion.qmd)
+
+## Inferencia bayesiana
+
+### Distribución previa {#gl-previa}
+Lo que se sabe o se supone de un parámetro antes de ver los datos. → [Capítulo 7](07-bayes.qmd)
+
+### Verosimilitud {#gl-verosimilitud}
+Cuán probables son los datos observados para cada valor del parámetro. → [Capítulo 7](07-bayes.qmd)
+
+### Distribución posterior {#gl-posterior}
+Distribución del parámetro una vez combinadas la previa y los datos. → [Capítulo 7](07-bayes.qmd)
+
+### Intervalo de credibilidad {#gl-credibilidad}
+Intervalo que contiene el parámetro con una probabilidad dada, según la posterior. → [Capítulo 7](07-bayes.qmd)
+
+### Factor de Bayes {#gl-bf}
+Cociente que compara cuánto mejor predicen los datos una hipótesis que otra. → [Capítulo 7](07-bayes.qmd)

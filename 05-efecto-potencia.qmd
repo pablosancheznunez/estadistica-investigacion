@@ -1,0 +1,242 @@
+---
+engine: markdown
+---
+
+# Capítulo 5. Tamaño del efecto y potencia {#sec-cap5}
+
+::: {.callout-note appearance="default"}
+## Objetivos
+- Calcular, informar e interpretar tamaños del efecto estandarizados y no estandarizados.
+- Entender la potencia estadística y sus determinantes.
+- Justificar el tamaño de la muestra de un estudio.
+:::
+
+::: {.callout-note appearance="simple" icon="false"}
+## Glosario del capítulo
+[Tamaño del efecto](92-glosario.qmd#gl-efecto) · [d de Cohen](92-glosario.qmd#gl-d) · [Potencia](92-glosario.qmd#gl-potencia) · [Efecto mínimo de interés](92-glosario.qmd#gl-sesoi) · [Justificación de la muestra](92-glosario.qmd#gl-justificacion)
+:::
+
+::: {.callout-tip appearance="simple" icon="false"}
+## Descargas
+[Script R del capítulo](plantillas/05_efecto_potencia.R){.btn .btn-outline-primary .btn-sm download="05_efecto_potencia.R"}
+[Plantilla de entrega del reto (.qmd)](plantillas/entrega_reto.qmd){.btn .btn-outline-primary .btn-sm download="entrega_reto.qmd"}
+:::
+
+## Lectura obligatoria
+
+::: {.lectura}
+Lakens, D. (2022). [Sample size justification](https://doi.org/10.1525/collabra.33267). *Collabra: Psychology*, 8(1), 33267.
+:::
+
+### Lecturas complementarias {.unnumbered}
+
+- Lakens, D. (2013). [Calculating and reporting effect sizes to facilitate cumulative science: A practical primer for *t*-tests and ANOVAs](https://doi.org/10.3389/fpsyg.2013.00863). *Frontiers in Psychology*, 4, 863.
+
+## 1. Cuánto, no solo si
+
+Un **tamaño del efecto** cuantifica la magnitud de un fenómeno. Puede expresarse en las **unidades originales** (la tutoría sube la nota 0,4 puntos) o de forma **estandarizada**, sin unidades, para comparar estudios:
+
+| Medida | Para | Fórmula o función |
+|---|---|---|
+| Diferencia de medias | Dos grupos, unidades comprensibles | `mean(a) - mean(b)` |
+| *d* de Cohen | Dos grupos, estandarizado | diferencia / desviación típica combinada |
+| *r* | Relación entre dos variables | `cor(x, y)` |
+| *R*² | Variación explicada por un modelo | `summary(lm(...))$r.squared` |
+| Razón de odds, riesgo relativo | Resultados binarios | `glm(..., family = binomial)` |
+
+Las etiquetas de Cohen (*d* = 0,2 pequeño, 0,5 mediano, 0,8 grande) eran orientativas y él mismo pedía usarlas solo cuando no hubiera nada mejor. Lo que importa es si el efecto es **relevante en su contexto**: medio punto de nota puede ser mucho o poco según para qué.
+
+```{webr}
+#| autorun: true
+d <- read.csv("datos/estudio.csv")
+a <- d$nota[d$grupo == "tutoria"]; b <- d$nota[d$grupo == "control"]
+dif <- mean(a) - mean(b)
+d_cohen <- dif / sqrt((var(a) + var(b)) / 2)
+c(diferencia = dif, d = d_cohen)
+```
+
+## 2. Potencia
+
+La **potencia** es la probabilidad de detectar un efecto de un tamaño dado si existe. Depende de cuatro cosas, y conocidas tres se calcula la cuarta:
+
+1. El **tamaño del efecto** que se quiere detectar.
+2. La **variabilidad** de los datos.
+3. El **tamaño de la muestra**.
+4. El umbral α.
+
+Una potencia del 80 % es la convención mínima; muchos estudios publicados tienen bastante menos (véase el capítulo 3 de [*Ciencia de la ciencia y metaciencia*](https://pablosancheznunez.com/ciencia-de-la-ciencia/03-reproducibilidad.html)). Con poca potencia, los resultados significativos tienden a exagerar el efecto y a no replicarse.
+
+```{webr}
+#| autorun: true
+# ¿Qué potencia tenía nuestro estudio (60 por grupo) para detectar 0,4 puntos con sd = 1,3?
+power.t.test(n = 60, delta = 0.4, sd = 1.3)$power
+# ¿Cuántas personas por grupo harían falta para una potencia del 80 %?
+power.t.test(delta = 0.4, sd = 1.3, power = 0.8)$n
+```
+
+Nuestro estudio solo tenía un 39 % de potencia para ese efecto: no es extraño que la diferencia no fuera significativa. Para tener un 80 %, harían falta unas **167 personas por grupo**.
+
+## Laboratorio: potencia {#lab-c5-potencia}
+
+::: {.laboratorio}
+::: {.laboratorio-etiqueta}
+Laboratorio · cálculo en tu navegador
+:::
+
+Ajusta el efecto (*d*) y la muestra, y mira cómo se solapan las distribuciones del estadístico bajo la hipótesis nula (gris) y bajo el efecto real (azul). La potencia es el área azul más allá del valor crítico.
+
+```{ojs}
+//| echo: false
+rango = window.Lab.rango
+viewof w_d = rango("Efecto (d de Cohen)", [0.1, 1.2], {step: 0.05, value: 0.4, formato: x => x.toFixed(2).replace(".", ",")})
+viewof w_n = rango("Personas por grupo", [5, 300], {step: 5, value: 60})
+```
+
+```{ojs}
+//| echo: false
+{
+  const Phi = z => { const t = 1 / (1 + 0.2316419 * Math.abs(z)), d = 0.3989423 * Math.exp(-z * z / 2);
+    const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return z > 0 ? 1 - p : p; };
+  const ncp = w_d * Math.sqrt(w_n / 2), zc = 1.96, pot = 1 - Phi(zc - ncp) + Phi(-zc - ncp);
+  const dens = (x, m) => Math.exp(-((x - m) ** 2) / 2) / Math.sqrt(2 * Math.PI);
+  const X = x => 20 + (x + 4) * 440 / 14, Y = y => 170 - y * 380;
+  const curva = m => Array.from({length: 281}, (_, i) => { const x = -4 + i * 0.05; return `${X(x)},${Y(dens(x, m))}`; }).join(" ");
+  const area = Array.from({length: 281}, (_, i) => -4 + i * 0.05).filter(x => x >= zc);
+  const poly = `${X(zc)},${Y(0)} ` + area.map(x => `${X(x)},${Y(dens(x, ncp))}`).join(" ") + ` ${X(10)},${Y(0)}`;
+  const nec = Math.ceil(2 * ((1.96 + 0.8416) / w_d) ** 2);
+  const d = html`<div role="status"></div>`;
+  d.innerHTML = `<p style="font-size:1.15rem">Potencia ≈ <strong>${Math.round(100 * Math.min(pot, 0.999))} %</strong> <span class="${pot >= .8 ? "lab-bien" : pot >= .5 ? "lab-medio" : "lab-mal"}" style="font-weight:600">${pot >= .8 ? "· suficiente" : "· insuficiente"}</span> · para el 80 % harían falta unas <strong>${nec}</strong> personas por grupo.</p>
+   <svg viewBox="0 0 480 190" width="100%" style="max-width:480px" role="img" aria-label="Dos curvas normales; potencia ${Math.round(100 * pot)} por ciento">
+   <polygon points="${poly}" fill="#2a78d6" fill-opacity=".35"/>
+   <polyline points="${curva(0)}" fill="none" stroke="#8a8984" stroke-width="2"/><polyline points="${curva(ncp)}" fill="none" stroke="#2a78d6" stroke-width="2"/>
+   <line x1="${X(zc)}" x2="${X(zc)}" y1="10" y2="170" stroke="#eb6834" stroke-dasharray="4 3"/>
+   <line x1="20" x2="460" y1="170" y2="170" stroke="currentColor" stroke-opacity=".4"/>
+   <text x="${X(zc) + 4}" y="20" font-size="10" fill="currentColor">valor crítico</text></svg>
+   <p class="small">Aproximación normal para la prueba bilateral con α = 0,05; <code>power.t.test()</code> da el valor exacto.</p>`;
+  return d;
+}
+```
+:::
+
+## 3. Justificar el tamaño de la muestra
+
+Lakens (2022) distingue seis formas legítimas de justificar una muestra: medir a **toda la población**, limitaciones de **recursos**, análisis de **potencia** a priori, búsqueda de una **precisión** dada (anchura del intervalo), **heurísticos** y **ninguna justificación** (que hay que reconocer). Para el análisis de potencia, la clave es el **efecto mínimo de interés**: el más pequeño que tendría importancia teórica o práctica, no el que esperamos ni el de un estudio piloto pequeño (que suele estar inflado).
+
+### Ejercicio 5.1 {.unnumbered}
+
+¿Cuántas personas por grupo harían falta para detectar una diferencia de **0,5** puntos (sd = 1,3) con una potencia del **90 %**?
+
+```{webr}
+#| exercise: c5_n
+power.t.test(delta = 0.5, sd = 1.3, power = ______)$n
+```
+
+::: {.hint exercise="c5_n"}
+El 90 % se escribe 0.9.
+:::
+
+::: {.solution exercise="c5_n"}
+```r
+power.t.test(delta = 0.5, sd = 1.3, power = 0.9)$n
+```
+Unas 143 por grupo (redondea siempre hacia arriba).
+:::
+
+```{webr}
+#| exercise: c5_n
+#| check: true
+if (isTRUE(all.equal(as.numeric(.result), power.t.test(delta = 0.5, sd = 1.3, power = 0.9)$n))) list(correct = TRUE, message = paste0("Correcto: ", ceiling(.result), " personas por grupo.")) else
+  list(correct = FALSE, message = "Escribe power = 0.9.")
+```
+
+### Ejercicio 5.2 {.unnumbered}
+
+Calcula la ***d* de Cohen** de la diferencia en horas de estudio entre los grupos.
+
+```{webr}
+#| exercise: c5_d
+#| setup: true
+d <- read.csv("datos/estudio.csv")
+a <- d$horas[d$grupo == "tutoria"]; b <- d$horas[d$grupo == "control"]
+```
+
+```{webr}
+#| exercise: c5_d
+(mean(a) - mean(b)) / sqrt((var(a) + ______) / 2)
+```
+
+::: {.hint exercise="c5_d"}
+Falta la varianza del segundo grupo: `var(b)`.
+:::
+
+::: {.solution exercise="c5_d"}
+```r
+(mean(a) - mean(b)) / sqrt((var(a) + var(b)) / 2)
+```
+Un efecto muy pequeño: la aleatorización produjo grupos parecidos en horas de estudio.
+:::
+
+```{webr}
+#| exercise: c5_d
+#| check: true
+dd <- read.csv("datos/estudio.csv"); aa <- dd$horas[dd$grupo == "tutoria"]; bb <- dd$horas[dd$grupo == "control"]
+if (isTRUE(all.equal(as.numeric(.result), (mean(aa) - mean(bb)) / sqrt((var(aa) + var(bb)) / 2)))) list(correct = TRUE, message = "Correcto.") else
+  list(correct = FALSE, message = "Suma var(b) dentro de la raíz.")
+```
+
+## Actividades
+
+::: {.clasificar #ia-c5-potencia titulo="¿La potencia sube o baja?" categorias="Sube|Baja"}
+- Aumentar el tamaño de la muestra → Sube
+- Querer detectar un efecto más pequeño → Baja
+- Usar α = 0,005 en lugar de 0,05 → Baja
+- Medir con menos ruido (más fiabilidad) → Sube
+- Usar un diseño intrasujeto en lugar de entre grupos → Sube // Si las medidas están correlacionadas.
+:::
+
+::: {.clasificar #ia-c5-justif titulo="¿Qué justificación de la muestra es (Lakens, 2022)?" categorias="Toda la población|Recursos|Análisis de potencia|Precisión"}
+- Estudiamos los 47 programas de doctorado de la universidad → Toda la población
+- Solo hay presupuesto para 80 participantes → Recursos // Hay que decir qué se podrá concluir con ellos.
+- Calculamos la muestra para un 90 % de potencia ante el efecto mínimo de interés → Análisis de potencia
+- Queremos que el intervalo de la media tenga una anchura de ±0,2 puntos → Precisión
+:::
+
+## Reto evaluable {#reto-c5}
+
+::: {.callout-important appearance="simple" icon="false"}
+## Reto del capítulo 5 · Justifica tu muestra
+1. Para tu próximo estudio, define el **efecto mínimo de interés** y justifícalo (teoría, relevancia práctica, coste).
+2. Haz un **análisis de potencia** con R para varios escenarios y presenta una curva de potencia.
+3. Si tus recursos limitan la muestra, calcula qué efectos podrás detectar con ella (análisis de sensibilidad).
+4. Redacta el párrafo de justificación de la muestra para tu preregistro o tu artículo, siguiendo a Lakens (2022).
+
+**Entrega:** con la [plantilla de entrega](plantillas/entrega_reto.qmd). Este reto **no tiene solución en el libro**.
+:::
+
+## Autoevaluación
+
+Responde a todas las preguntas y pulsa **Mostrar respuestas**. No cuenta para la nota.
+
+::: {.webex-check .webex-box}
+1. La *d* de Cohen es la diferencia de medias dividida entre la desviación típica {{< fitb "combinada" ignorecase=true >}}
+2. Las etiquetas de Cohen (0,2; 0,5; 0,8) deben usarse siempre para decidir si un efecto es importante. {{< torf false >}}
+3. La potencia es la probabilidad de {{< mcq "cometer un falso positivo" "*detectar un efecto si existe" "que la hipótesis sea cierta" >}}
+4. Para un análisis de potencia, lo mejor es usar el efecto de un estudio piloto pequeño. {{< torf false >}}
+5. Si conoces el efecto, la variabilidad y α, puedes calcular la {{< mcq "media" "*muestra necesaria para una potencia dada" "correlación" >}}
+6. Nuestro estudio (60 por grupo) tenía una potencia de alrededor del {{< mcq "10 %" "*39 %" "80 %" "99 %" >}} para detectar 0,4 puntos
+7. El efecto más pequeño que tendría importancia teórica o práctica se llama efecto mínimo de {{< fitb "interés" "interes" ignorecase=true >}}
+8. ¿Por qué un resultado no significativo en un estudio con poca potencia es poco informativo?
+
+{{< longmcq "Porque los estudios pequeños tienen más errores de cálculo" "*Porque aunque exista un efecto relevante, el estudio tenía pocas probabilidades de detectarlo" "Porque el valor p es siempre mayor que 0,5" >}}
+:::
+
+::: {.webex-solution boton="Ver explicaciones"}
+- *Pooled standard deviation*.
+- Son orientativas; importa el contexto.
+- 1 − β.
+- Los pilotos pequeños dan efectos muy inciertos y a menudo inflados.
+- Es el análisis a priori.
+- `power.t.test(n = 60, delta = 0.4, sd = 1.3)`.
+- *Smallest effect size of interest* (SESOI).
+- La ausencia de significación no distingue «no hay efecto» de «no tenía forma de verlo».
+:::

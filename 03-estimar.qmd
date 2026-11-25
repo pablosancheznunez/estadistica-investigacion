@@ -1,0 +1,230 @@
+---
+engine: markdown
+---
+
+# Capítulo 3. Estimar con incertidumbre {#sec-cap3}
+
+::: {.callout-note appearance="default"}
+## Objetivos
+- Entender la variabilidad de muestreo y el error típico.
+- Calcular e interpretar correctamente un intervalo de confianza.
+- Pasar de «¿hay efecto?» a «¿cuánto efecto y con qué precisión?».
+:::
+
+::: {.callout-note appearance="simple" icon="false"}
+## Glosario del capítulo
+[Distribución muestral](92-glosario.qmd#gl-muestral) · [Error típico](92-glosario.qmd#gl-errortipico) · [Intervalo de confianza](92-glosario.qmd#gl-ic) · [Estimación](92-glosario.qmd#gl-estimacion) · [Remuestreo (*bootstrap*)](92-glosario.qmd#gl-bootstrap)
+:::
+
+::: {.callout-tip appearance="simple" icon="false"}
+## Descargas
+[Script R del capítulo](plantillas/03_estimar.R){.btn .btn-outline-primary .btn-sm download="03_estimar.R"}
+[Plantilla de entrega del reto (.qmd)](plantillas/entrega_reto.qmd){.btn .btn-outline-primary .btn-sm download="entrega_reto.qmd"}
+:::
+
+## Lectura obligatoria
+
+::: {.lectura}
+Cumming, G. (2014). [The new statistics: Why and how](https://doi.org/10.1177/0956797613504966). *Psychological Science*, 25(1), 7-29.
+:::
+
+## 1. Una muestra es una de muchas posibles
+
+Si repitieras el estudio con otros 120 doctorandos, la media sería otra. La **distribución muestral** describe cómo varía un estadístico (la media, una diferencia, una pendiente) de muestra en muestra. Su desviación típica es el **error típico**: para una media, aproximadamente `sd / sqrt(n)`. Cuanto mayor es la muestra, más precisa es la estimación, pero la precisión crece con la **raíz** de *n*: para reducir el error a la mitad hace falta cuadruplicar la muestra.
+
+## 2. El intervalo de confianza
+
+Un **intervalo de confianza del 95 %** es un procedimiento que, si se repitiera el estudio muchas veces, contendría el valor verdadero en el 95 % de las repeticiones. Para un estudio concreto, una forma práctica de leerlo (Cumming, 2014) es: el intervalo reúne los **valores del parámetro razonablemente compatibles con los datos**, y los valores del centro son más plausibles que los de los extremos.
+
+::: {.callout-warning appearance="simple" icon="false"}
+## Interpretaciones erróneas frecuentes
+- «Hay un 95 % de probabilidad de que el valor verdadero esté en *este* intervalo». En la estadística frecuentista, el valor verdadero es fijo: o está o no está; el 95 % se refiere al procedimiento.
+- «El 95 % de los datos está dentro del intervalo». El intervalo es para el parámetro (la media), no para las observaciones individuales.
+- «Si dos intervalos se solapan, no hay diferencia». Pueden solaparse algo y la diferencia ser significativa: hay que calcular el intervalo de la **diferencia**.
+:::
+
+```{webr}
+#| autorun: true
+d <- read.csv("datos/estudio.csv")
+t.test(d$nota)$conf.int                       # IC 95 % de la nota media
+t.test(nota ~ grupo, data = d)$conf.int       # IC 95 % de la diferencia (control − tutoría)
+```
+
+## Laboratorio: el baile de los intervalos {#lab-c3-baile}
+
+::: {.laboratorio}
+::: {.laboratorio-etiqueta}
+Laboratorio · simulación en tu navegador
+:::
+
+Simulamos 50 estudios de la misma población (media verdadera = 50, desviación típica = 10). Cada línea es el intervalo de confianza de un estudio; en naranja, los que **no** contienen el valor verdadero. Cambia el tamaño de la muestra y el nivel de confianza, y pulsa **Repetir**.
+
+```{ojs}
+//| echo: false
+rango = window.Lab.rango
+seleccion = window.Lab.seleccion
+boton = window.Lab.boton
+viewof b_n = rango("Tamaño de cada muestra", [5, 200], {step: 5, value: 20})
+viewof b_conf = seleccion("Nivel de confianza", [["0.8", "80 %"], ["0.9", "90 %"], ["0.95", "95 %"], ["0.99", "99 %"]], {value: "0.95"})
+viewof b_rep = boton("Repetir con 50 estudios nuevos")
+```
+
+```{ojs}
+//| echo: false
+{
+  b_rep;
+  const z = {"0.8": 1.2816, "0.9": 1.6449, "0.95": 1.96, "0.99": 2.5758}[b_conf];
+  const nrm = () => Math.sqrt(-2 * Math.log(Math.random() || 1e-9)) * Math.cos(2 * Math.PI * Math.random());
+  const ics = Array.from({length: 50}, () => { const x = Array.from({length: b_n}, () => 50 + 10 * nrm());
+    const m = x.reduce((a, b) => a + b) / b_n, s = Math.sqrt(x.reduce((a, v) => a + (v - m) ** 2, 0) / (b_n - 1)), e = z * s / Math.sqrt(b_n);
+    return [m - e, m, m + e]; });
+  const fuera = ics.filter(([l, , u]) => l > 50 || u < 50).length;
+  const X = v => 20 + (v - 30) * 11;
+  const lin = ics.map(([l, m, u], i) => { const mal = l > 50 || u < 50; const c = mal ? "#eb6834" : "#2a78d6";
+    return `<line x1="${X(Math.max(30, l))}" x2="${X(Math.min(70, u))}" y1="${10 + i * 6}" y2="${10 + i * 6}" stroke="${c}" stroke-width="2.5"/><circle cx="${X(m)}" cy="${10 + i * 6}" r="1.8" fill="${c}"/>`; }).join("");
+  const d = html`<div role="status"></div>`;
+  d.innerHTML = `<p>${50 - fuera} de 50 intervalos contienen la media verdadera (${fuera} no, en naranja). Lo esperado: ${Math.round(50 * +b_conf)}.</p>
+   <svg viewBox="0 0 480 320" width="100%" style="max-width:480px" role="img" aria-label="50 intervalos de confianza; ${fuera} no contienen el valor verdadero">
+   <line x1="${X(50)}" x2="${X(50)}" y1="4" y2="312" stroke="currentColor" stroke-dasharray="4 3"/>${lin}
+   <text x="${X(50) + 4}" y="318" font-size="10" fill="currentColor">media verdadera = 50</text></svg>
+   <p class="small">Con muestras pequeñas, los intervalos son anchos y saltan mucho de un estudio a otro. Cualquier estudio concreto puede ser uno de los naranjas, y no hay forma de saberlo.</p>`;
+  return d;
+}
+```
+:::
+
+## 3. Remuestreo: el *bootstrap*
+
+Cuando no hay una fórmula sencilla (por ejemplo, para una mediana), el **bootstrap** aproxima la distribución muestral **remuestreando con reemplazo** los propios datos muchas veces.
+
+```{webr}
+#| autorun: true
+d <- read.csv("datos/estudio.csv")
+set.seed(1)
+medianas <- replicate(2000, median(sample(d$nota, replace = TRUE)))
+quantile(medianas, c(0.025, 0.975))    # IC 95 % bootstrap de la mediana
+```
+
+### Ejercicio 3.1 {.unnumbered}
+
+Calcula el **error típico** de la nota media: la desviación típica entre la raíz del tamaño de la muestra.
+
+```{webr}
+#| exercise: c3_et
+#| setup: true
+d <- read.csv("datos/estudio.csv")
+```
+
+```{webr}
+#| exercise: c3_et
+sd(d$nota) / ______(nrow(d))
+```
+
+::: {.hint exercise="c3_et"}
+La raíz cuadrada en R es `sqrt()`.
+:::
+
+::: {.solution exercise="c3_et"}
+```r
+sd(d$nota) / sqrt(nrow(d))
+```
+Unos 0,14 puntos. El IC 95 % es, aproximadamente, la media ± 2 errores típicos.
+:::
+
+```{webr}
+#| exercise: c3_et
+#| check: true
+dd <- read.csv("datos/estudio.csv")
+if (isTRUE(all.equal(as.numeric(.result), sd(dd$nota) / sqrt(nrow(dd))))) list(correct = TRUE, message = "Correcto: error típico ≈ 0,14.") else
+  list(correct = FALSE, message = "Usa sqrt().")
+```
+
+### Ejercicio 3.2 {.unnumbered}
+
+Calcula el intervalo de confianza del **99 %** de la nota media.
+
+```{webr}
+#| exercise: c3_ic99
+#| setup: true
+d <- read.csv("datos/estudio.csv")
+```
+
+```{webr}
+#| exercise: c3_ic99
+t.test(d$nota, conf.level = ______)$conf.int
+```
+
+::: {.hint exercise="c3_ic99"}
+El 99 % se escribe 0.99.
+:::
+
+::: {.solution exercise="c3_ic99"}
+```r
+t.test(d$nota, conf.level = 0.99)$conf.int
+```
+Más ancho que el del 95 %: más confianza exige un intervalo mayor.
+:::
+
+```{webr}
+#| exercise: c3_ic99
+#| check: true
+dd <- read.csv("datos/estudio.csv")
+if (isTRUE(all.equal(as.numeric(.result), as.numeric(t.test(dd$nota, conf.level = 0.99)$conf.int)))) list(correct = TRUE, message = "Correcto.") else
+  list(correct = FALSE, message = "Escribe conf.level = 0.99.")
+```
+
+## Actividades
+
+::: {.clasificar #ia-c3-interpreta titulo="¿Interpretación correcta del IC 95 % [5,99; 6,53]?" categorias="Correcta|Incorrecta"}
+- Los valores entre 5,99 y 6,53 son los razonablemente compatibles con los datos para la nota media → Correcta
+- El 95 % de los doctorandos tiene una nota entre 5,99 y 6,53 → Incorrecta // El intervalo es para la media, no para las personas.
+- Si repitiéramos el estudio muchas veces, el 95 % de los intervalos así calculados contendría la media verdadera → Correcta
+- Hay un 95 % de probabilidad de que la media verdadera esté en este intervalo concreto → Incorrecta // Esa es una lectura bayesiana; en frecuentista, la probabilidad se refiere al procedimiento.
+:::
+
+::: {.clasificar #ia-c3-ancho titulo="¿El intervalo se estrecha o se ensancha?" categorias="Se estrecha|Se ensancha"}
+- Aumentar el tamaño de la muestra → Se estrecha
+- Pasar del 95 % al 99 % de confianza → Se ensancha
+- Medir con un instrumento más ruidoso → Se ensancha
+- Reducir la variabilidad entre participantes con un diseño intrasujeto → Se estrecha
+:::
+
+## Reto evaluable {#reto-c3}
+
+::: {.callout-important appearance="simple" icon="false"}
+## Reto del capítulo 3 · Reescribe unos resultados en clave de estimación
+1. Toma un artículo de tu campo que informe solo de valores *p* («la diferencia fue significativa, *p* < 0,05»).
+2. Con los datos que dé (medias, desviaciones, *n*), calcula los **intervalos de confianza** de los efectos principales.
+3. Reescribe el párrafo de resultados centrado en **cuánto** efecto y con **qué precisión**, al estilo de Cumming (2014).
+4. Discute si las conclusiones del artículo cambian con esta lectura.
+
+**Entrega:** con la [plantilla de entrega](plantillas/entrega_reto.qmd). Este reto **no tiene solución en el libro**.
+:::
+
+## Autoevaluación
+
+Responde a todas las preguntas y pulsa **Mostrar respuestas**. No cuenta para la nota.
+
+::: {.webex-check .webex-box}
+1. Para reducir a la mitad el error típico de una media hay que multiplicar la muestra por {{< mcq "2" "*4" "10" >}}
+2. Un intervalo del 99 % es más estrecho que uno del 95 % con los mismos datos. {{< torf false >}}
+3. El IC 95 % contiene el 95 % de las observaciones individuales. {{< torf false >}}
+4. La desviación típica de la distribución muestral de un estadístico se llama error {{< fitb "típico" "tipico" "estándar" "estandar" ignorecase=true >}}
+5. Remuestrear con reemplazo los propios datos para estimar la incertidumbre es el {{< fitb "bootstrap" ignorecase=true >}}
+6. Si dos intervalos se solapan un poco, la diferencia nunca puede ser significativa. {{< torf false >}}
+7. En el laboratorio, con intervalos del 95 %, ¿cuántos de cada 50 esperas que no contengan la media verdadera? {{< mcq "0" "*2 o 3" "25" >}}
+8. ¿Qué propone Cumming con la «nueva estadística»?
+
+{{< longmcq "Abandonar los datos cuantitativos" "*Centrarse en estimar efectos con intervalos y acumular evidencia con metaanálisis" "Usar solo valores p más pequeños" >}}
+:::
+
+::: {.webex-solution boton="Ver explicaciones"}
+- Precisión ∝ raíz de *n*.
+- Más confianza, más anchura.
+- Es para el parámetro.
+- *Standard error*.
+- Efron, 1979.
+- Hay que mirar el intervalo de la diferencia.
+- El 5 % de 50 es 2,5.
+- Estimación y metaanálisis.
+:::

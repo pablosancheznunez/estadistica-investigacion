@@ -1,0 +1,248 @@
+---
+engine: markdown
+---
+
+# Capítulo 6. Regresión {#sec-cap6}
+
+::: {.callout-note appearance="default"}
+## Objetivos
+- Ajustar e interpretar modelos de regresión lineal simple y múltiple.
+- Comprobar los supuestos con los residuos.
+- Saber qué puede y qué no puede decir un coeficiente sobre causas.
+:::
+
+::: {.callout-note appearance="simple" icon="false"}
+## Glosario del capítulo
+[Regresión lineal](92-glosario.qmd#gl-regresion) · [Coeficiente](92-glosario.qmd#gl-coeficiente) · [Residuo](92-glosario.qmd#gl-residuo) · [R²](92-glosario.qmd#gl-r2) · [Variable centrada](92-glosario.qmd#gl-centrar) · [Sobreajuste](92-glosario.qmd#gl-sobreajuste)
+:::
+
+::: {.callout-tip appearance="simple" icon="false"}
+## Descargas
+[Script R del capítulo](plantillas/06_regresion.R){.btn .btn-outline-primary .btn-sm download="06_regresion.R"}
+[Plantilla de entrega del reto (.qmd)](plantillas/entrega_reto.qmd){.btn .btn-outline-primary .btn-sm download="entrega_reto.qmd"}
+:::
+
+## Lectura obligatoria
+
+::: {.lectura}
+Schielzeth, H. (2010). [Simple means to improve the interpretability of regression coefficients](https://doi.org/10.1111/j.2041-210X.2010.00012.x). *Methods in Ecology and Evolution*, 1(2), 103-113.
+:::
+
+## 1. La recta que mejor se ajusta
+
+La **regresión lineal** modela una variable resultado como una combinación lineal de predictores más un error:
+
+`nota = b0 + b1 · horas + error`
+
+`b1` es el cambio **esperado** en la nota por cada hora más de estudio; `b0`, la nota esperada con 0 horas (a menudo, sin sentido práctico: por eso conviene **centrar** los predictores, como recomienda Schielzeth, 2010).
+
+```{webr}
+#| autorun: true
+#| fig-height: 4
+d <- read.csv("datos/estudio.csv")
+m1 <- lm(nota ~ horas, data = d)
+summary(m1)$coefficients
+confint(m1)
+plot(d$horas, d$nota, pch = 19, col = "#2a78d6", xlab = "Horas de estudio", ylab = "Nota")
+abline(m1, col = "#eb6834", lwd = 2)
+```
+
+Cada hora más de estudio se asocia con unos 0,14 puntos más de nota (IC 95 %: 0,09 a 0,19). El **R²** indica qué proporción de la variabilidad de la nota explica el modelo (aquí, en torno al 22 %).
+
+## 2. Varios predictores a la vez
+
+En la regresión **múltiple**, cada coeficiente es la asociación con el resultado **manteniendo constantes** los demás predictores del modelo.
+
+```{webr}
+#| autorun: true
+d <- read.csv("datos/estudio.csv")
+d$horas_c <- d$horas - mean(d$horas)      # centrar
+d$sueno_c <- d$sueno - mean(d$sueno)
+d$ansiedad_c <- d$ansiedad - mean(d$ansiedad)
+m2 <- lm(nota ~ grupo + horas_c + sueno_c + ansiedad_c, data = d)
+round(summary(m2)$coefficients, 3)
+summary(m2)$r.squared
+```
+
+Con los predictores centrados, la constante es la nota esperada en el grupo de referencia (control) para alguien con horas, sueño y ansiedad medios. Fíjate en que el coeficiente de `grupotutoria` (el efecto de la tutoría ajustado por las demás variables) se estima con algo más de precisión que en la simple comparación de medias: ajustar por covariables que predicen el resultado **aumenta la precisión** en un experimento.
+
+## 3. Comprobar los supuestos
+
+La regresión lineal supone, sobre todo: relación **lineal**, **independencia** de los errores, **varianza constante** y, para los intervalos con muestras pequeñas, errores aproximadamente **normales**. Se comprueba mirando los **residuos**:
+
+```{webr}
+#| autorun: true
+#| fig-height: 4
+d <- read.csv("datos/estudio.csv")
+m1 <- lm(nota ~ horas, data = d)
+par(mfrow = c(1, 2))
+plot(fitted(m1), resid(m1), pch = 19, col = "#2a78d6", xlab = "Valores ajustados", ylab = "Residuos"); abline(h = 0, lty = 2)
+qqnorm(resid(m1), pch = 19, col = "#2a78d6"); qqline(resid(m1))
+```
+
+Buscas que los residuos no formen patrones (curvas, embudos) y que los puntos del gráfico Q-Q sigan la recta.
+
+## Laboratorio: un punto puede cambiarlo todo {#lab-c6-palanca}
+
+::: {.laboratorio}
+::: {.laboratorio-etiqueta}
+Laboratorio · se ejecuta en tu navegador
+:::
+
+Diez puntos sin relación aparente y un undécimo que puedes mover. Un punto alejado en el eje *x* (con mucha **palanca**) puede crear o destruir una pendiente.
+
+```{ojs}
+//| echo: false
+rango = window.Lab.rango
+viewof q_x = rango("Posición x del punto móvil", [0, 20], {step: 0.5, value: 5})
+viewof q_y = rango("Posición y del punto móvil", [0, 20], {step: 0.5, value: 5})
+```
+
+```{ojs}
+//| echo: false
+{
+  const base = [[2, 5], [3, 7], [4, 4], [5, 6], [5.5, 5], [6, 7.5], [6.5, 4.5], [7, 6], [8, 5], [9, 6.5]];
+  const pts = base.concat([[q_x, q_y]]);
+  const n = pts.length, mx = pts.reduce((s, p) => s + p[0], 0) / n, my = pts.reduce((s, p) => s + p[1], 0) / n;
+  const sxy = pts.reduce((s, p) => s + (p[0] - mx) * (p[1] - my), 0), sxx = pts.reduce((s, p) => s + (p[0] - mx) ** 2, 0), syy = pts.reduce((s, p) => s + (p[1] - my) ** 2, 0);
+  const b = sxy / sxx, a = my - b * mx, r = sxy / Math.sqrt(sxx * syy);
+  const X = x => 30 + x * 22, Y = y => 220 - y * 10;
+  const f = v => v.toFixed(2).replace(".", ",");
+  const d = html`<div role="status"></div>`;
+  d.innerHTML = `<p>Pendiente = <strong>${f(b)}</strong> · <em>r</em> = ${f(r)}</p>
+   <svg viewBox="0 0 480 240" width="100%" style="max-width:480px" role="img" aria-label="Diagrama de dispersión con once puntos y su recta; pendiente ${f(b)}">
+   <line x1="30" y1="220" x2="470" y2="220" stroke="currentColor" stroke-opacity=".4"/><line x1="30" y1="10" x2="30" y2="220" stroke="currentColor" stroke-opacity=".4"/>
+   <line x1="${X(0)}" y1="${Y(a)}" x2="${X(20)}" y2="${Y(a + b * 20)}" stroke="#2a78d6" stroke-width="2"/>
+   ${base.map(p => `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="5" fill="#2a78d6"/>`).join("")}
+   <circle cx="${X(q_x)}" cy="${Y(q_y)}" r="7" fill="#eb6834"/></svg>
+   <p class="small">Lleva el punto naranja a x = 20, y = 20: aparece una relación «fuerte» creada por un solo dato. Revisa siempre los puntos influyentes (en R, <code>cooks.distance()</code>).</p>`;
+  return d;
+}
+```
+:::
+
+### Ejercicio 6.1 {.unnumbered}
+
+Usa el modelo `m1` para **predecir** la nota de alguien que estudia 20 horas a la semana.
+
+```{webr}
+#| exercise: c6_pred
+#| setup: true
+d <- read.csv("datos/estudio.csv")
+m1 <- lm(nota ~ horas, data = d)
+```
+
+```{webr}
+#| exercise: c6_pred
+predict(m1, newdata = data.frame(horas = ______))
+```
+
+::: {.hint exercise="c6_pred"}
+Sustituye el hueco por 20.
+:::
+
+::: {.solution exercise="c6_pred"}
+```r
+predict(m1, newdata = data.frame(horas = 20))
+```
+Unos 7,2 puntos. Con `interval = "prediction"` verás el intervalo para una persona concreta, mucho más ancho que el de la media.
+:::
+
+```{webr}
+#| exercise: c6_pred
+#| check: true
+dd <- read.csv("datos/estudio.csv"); mm <- lm(nota ~ horas, data = dd)
+if (isTRUE(all.equal(as.numeric(.result), as.numeric(predict(mm, data.frame(horas = 20)))))) list(correct = TRUE, message = "Correcto: unos 7,2 puntos.") else
+  list(correct = FALSE, message = "Escribe horas = 20.")
+```
+
+### Ejercicio 6.2 {.unnumbered}
+
+Calcula el **R²** del modelo con horas y sueño.
+
+```{webr}
+#| exercise: c6_r2
+#| setup: true
+d <- read.csv("datos/estudio.csv")
+```
+
+```{webr}
+#| exercise: c6_r2
+m <- lm(nota ~ horas + ______, data = d)
+summary(m)$r.squared
+```
+
+::: {.hint exercise="c6_r2"}
+La variable del sueño se llama `sueno`.
+:::
+
+::: {.solution exercise="c6_r2"}
+```r
+m <- lm(nota ~ horas + sueno, data = d)
+summary(m)$r.squared
+```
+Algo mayor que con solo las horas. El R² siempre sube al añadir predictores, aunque no aporten nada: por eso existe el R² ajustado.
+:::
+
+```{webr}
+#| exercise: c6_r2
+#| check: true
+dd <- read.csv("datos/estudio.csv")
+if (isTRUE(all.equal(as.numeric(.result), summary(lm(nota ~ horas + sueno, data = dd))$r.squared))) list(correct = TRUE, message = "Correcto.") else
+  list(correct = FALSE, message = "Añade sueno al modelo.")
+```
+
+## Actividades
+
+::: {.clasificar #ia-c6-interpretar titulo="El coeficiente de horas es 0,14 (IC 95 %: 0,09 a 0,19). ¿La interpretación es correcta?" categorias="Correcta|Incorrecta"}
+- Cada hora más de estudio se asocia con 0,14 puntos más de nota, en promedio → Correcta
+- Si un doctorando estudia una hora más, su nota subirá 0,14 puntos → Incorrecta // Es un estudio observacional: no autoriza la lectura causal individual.
+- Los datos son compatibles con asociaciones entre 0,09 y 0,19 puntos por hora → Correcta
+- Las horas explican el 14 % de la nota → Incorrecta // Eso sería el R², no el coeficiente.
+:::
+
+::: {.clasificar #ia-c6-residuos titulo="¿Qué problema muestra el gráfico de residuos?" categorias="Relación no lineal|Varianza no constante|Ninguno aparente"}
+- Los residuos forman una U → Relación no lineal
+- Los residuos se abren en abanico al aumentar los valores ajustados → Varianza no constante
+- Una nube sin forma alrededor de cero → Ninguno aparente
+:::
+
+## Reto evaluable {#reto-c6}
+
+::: {.callout-important appearance="simple" icon="false"}
+## Reto del capítulo 6 · Un modelo bien contado
+1. Con los datos del libro (o con los tuyos), plantea una pregunta y ajusta un modelo de regresión múltiple justificado (no un modelo con «todo lo que hay»).
+2. Centra los predictores continuos e interpreta cada coeficiente con su intervalo, en las unidades originales.
+3. Comprueba los supuestos con los residuos y revisa los puntos influyentes.
+4. Escribe el párrafo de resultados y un párrafo de limitaciones sobre causalidad.
+
+**Entrega:** con la [plantilla de entrega](plantillas/entrega_reto.qmd). Este reto **no tiene solución en el libro**.
+:::
+
+## Autoevaluación
+
+Responde a todas las preguntas y pulsa **Mostrar respuestas**. No cuenta para la nota.
+
+::: {.webex-check .webex-box}
+1. En una regresión múltiple, cada coeficiente se interpreta manteniendo constantes los demás predictores del modelo. {{< torf true >}}
+2. Restar la media a un predictor se llama {{< fitb "centrar" ignorecase=true >}}
+3. El R² siempre aumenta al añadir predictores. {{< torf true >}}
+4. Un residuo es {{< mcq "el valor predicho" "*la diferencia entre el valor observado y el predicho" "el coeficiente de una variable" >}}
+5. Un coeficiente de regresión en un estudio observacional prueba una relación causal. {{< torf false >}}
+6. Un punto con un valor de *x* muy alejado del resto tiene mucha {{< fitb "palanca" ignorecase=true >}}
+7. En un experimento, ajustar por covariables que predicen el resultado {{< mcq "introduce sesgo siempre" "*suele mejorar la precisión del efecto" "no cambia nada" >}}
+8. ¿Qué intervalo es más ancho?
+
+{{< longmcq "El de la nota media esperada para quienes estudian 20 horas" "*El de la nota de una persona concreta que estudia 20 horas" "Son iguales" >}}
+:::
+
+::: {.webex-solution boton="Ver explicaciones"}
+- «Ceteris paribus», dentro del modelo.
+- Hace interpretable la constante.
+- Por eso existe el R² ajustado.
+- Observado menos predicho.
+- Asociación ajustada, no causa.
+- *Leverage*.
+- Reduce el error típico del efecto.
+- El de predicción incluye la variabilidad individual.
+:::
