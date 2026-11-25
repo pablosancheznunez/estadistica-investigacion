@@ -57,6 +57,50 @@ viewof nTcl = rangoT("Tamaño de cada muestra (n)", [1, 100], {value: 5})
 - ¿Tienen más citas los artículos con datos abiertos que los que no los tienen? → t para dos grupos // Dos grupos; con citas muy asimétricas, considera transformarlas o usar Mann-Whitney.
 :::
 
+## Laboratorio: conversor de tamaños del efecto {#lab-efecto}
+
+::: {.laboratorio}
+::: {.laboratorio-etiqueta}
+Laboratorio · se ejecuta en tu navegador
+:::
+
+Los estudios informan del efecto en métricas distintas. Este conversor pasa entre la *d* de Cohen, la correlación *r* y la razón de odds (OR), y traduce el efecto a probabilidades que se entienden sin estadística. Las conversiones suponen dos grupos de igual tamaño y distribuciones normales.
+
+```{ojs}
+//| echo: false
+selE = window.Lab.seleccion
+rangoE = window.Lab.rango
+viewof metrica = selE("Tengo el efecto como…", ["d de Cohen", "r de Pearson", "Razón de odds (OR)"], {value: "d de Cohen"})
+viewof valorE = rangoE(metrica === "d de Cohen" ? "Valor de d" : metrica === "r de Pearson" ? "Valor de r" : "Valor de OR", metrica === "d de Cohen" ? [0, 2] : metrica === "r de Pearson" ? [0, 0.9] : [1, 20], {step: metrica === "Razón de odds (OR)" ? 0.1 : 0.01, value: metrica === "d de Cohen" ? 0.5 : metrica === "r de Pearson" ? 0.24 : 2.5, formato: (x) => x.toFixed(2).replace(".", ",")})
+```
+
+```{ojs}
+//| echo: false
+{
+  const Phi = (z) => { const t = 1 / (1 + 0.2316419 * Math.abs(z)), dd = 0.3989423 * Math.exp(-z * z / 2); const p = dd * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))); return z > 0 ? 1 - p : p; };
+  const d = metrica === "d de Cohen" ? valorE : metrica === "r de Pearson" ? 2 * valorE / Math.sqrt(1 - valorE ** 2) : Math.log(valorE) * Math.sqrt(3) / Math.PI;
+  const r = d / Math.sqrt(d * d + 4), or = Math.exp(d * Math.PI / Math.sqrt(3));
+  const sup = Phi(d / Math.SQRT2), u3 = Phi(d), solap = 2 * Phi(-Math.abs(d) / 2);
+  const f = (x, k = 2) => x.toFixed(k).replace(".", ","), pc = (x) => Math.round(x * 100) + " %";
+  const W = 520, H = 170, x = (v) => 20 + (v + 4) / 9 * (W - 40), y = (v) => H - 25 - v * 300;
+  const curva = (m) => Array.from({length: 121}, (_, i) => { const v = -4 + i * 0.075; return `${i ? "L" : "M"}${x(v).toFixed(1)} ${y(Math.exp(-((v - m) ** 2) / 2) / Math.sqrt(2 * Math.PI)).toFixed(1)}`; }).join(" ");
+  const svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-width:560px" role="img" aria-label="Dos distribuciones normales separadas ${f(d)} desviaciones típicas" font-family="inherit"><path d="${curva(0)}" fill="#8a8a8a" fill-opacity="0.35" stroke="#52514e"/><path d="${curva(d)}" fill="#2a78d6" fill-opacity="0.35" stroke="#2a78d6"/><line x1="20" x2="${W - 20}" y1="${H - 25}" y2="${H - 25}" stroke="currentColor"/><text x="${x(0)}" y="${H - 8}" font-size="11" text-anchor="middle" fill="currentColor">control</text><text x="${x(d)}" y="${H - 8}" font-size="11" text-anchor="middle" fill="#2a78d6">tratamiento</text></svg>`;
+  const etiqueta = d < 0.2 ? "muy pequeño" : d < 0.5 ? "pequeño" : d < 0.8 ? "mediano" : "grande";
+  const el = html`<div role="status" aria-live="polite"></div>`;
+  el.innerHTML = `${svg}<table class="table table-sm mt-2"><tbody>
+  <tr><th scope="row">d de Cohen</th><td>${f(d)}</td><td class="small">«${etiqueta}» según las convenciones de Cohen, que él mismo pedía no usar a ciegas</td></tr>
+  <tr><th scope="row">r de Pearson</th><td>${f(r)}</td><td class="small">r = d / √(d² + 4)</td></tr>
+  <tr><th scope="row">Razón de odds</th><td>${f(or)}</td><td class="small">ln(OR) = d · π / √3 (Chinn, 2000)</td></tr>
+  <tr><th scope="row">Probabilidad de superioridad</th><td>${pc(sup)}</td><td class="small">Si eliges al azar una persona de cada grupo, la del grupo tratado puntúa más alto el ${pc(sup)} de las veces (50 % = sin efecto)</td></tr>
+  <tr><th scope="row">U₃ de Cohen</th><td>${pc(u3)}</td><td class="small">Del grupo tratado, el ${pc(u3)} supera la media del grupo control</td></tr>
+  <tr><th scope="row">Solapamiento</th><td>${pc(solap)}</td><td class="small">Parte común de las dos distribuciones</td></tr></tbody></table>`;
+  return el;
+}
+```
+
+Fíjate en que incluso un efecto «grande» (d = 0,8) deja un solapamiento de casi el 70 %: muchas personas del grupo control puntúan más que muchas del grupo tratado.
+:::
+
 ## Para ver y seguir aprendiendo
 
 Son enlaces, no vídeos incrustados: el vídeo se abre en la web de quien lo publica, así esta página no carga rastreadores de terceros. La mayoría está en inglés; activa los subtítulos si los necesitas.
