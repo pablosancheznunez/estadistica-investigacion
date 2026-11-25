@@ -10,10 +10,10 @@ paginas = sys.argv[3:]
 def soluciones(qmd):
     txt = (LIBRO / qmd).read_text()
     return {m.group(1): m.group(2) for m in re.finditer(
-        r'::: \{\.solution exercise="([^"]+)"\}\s*\n```r\n(.*?)```', txt, re.S)}
+        r'::: \{\.solution exercise="([^"]+)"\}\s*\n```(?:r|python)\n(.*?)```', txt, re.S)}
 
 JS_LOCALIZA = """(ej) => {
-  for (const s of document.querySelectorAll('script[type^="webr-"][type$="-contents"]')) {
+  for (const s of document.querySelectorAll('script[type^="webr-"][type$="-contents"], script[type^="pyodide-"][type$="-contents"]')) {
     const d = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(s.textContent.trim()), c => c.charCodeAt(0))));
     if (d.attr.exercise === ej && !d.attr.setup && !d.attr.check) return s.type.replace('-contents','');
   }
@@ -39,7 +39,7 @@ try:
             html = qmd.replace(".qmd", ".html")
             pg = b.new_page(viewport={"width": 1300, "height": 900})
             externas = []
-            pg.route(re.compile(r"https?://(?!localhost).*"), lambda r: (externas.append(r.request.url), r.abort()) if "r-wasm.org" in r.request.url else r.continue_())
+            pg.route(re.compile(r"https?://(?!localhost).*"), lambda r: (externas.append(r.request.url), r.abort()) if ("r-wasm.org" in r.request.url or "jsdelivr" in r.request.url or "pypi" in r.request.url) else r.continue_())
             errores = []
             pg.on("pageerror", lambda e: errores.append(str(e)))
             pg.goto(f"http://localhost:8765/{html}", wait_until="load")
@@ -47,7 +47,7 @@ try:
             salidas = pg.eval_on_selector_all(".cell-output-container", "els => els.map(e => e.innerText)")
             vacias = sum(1 for s in salidas if not s.strip())
             errs_r = [s[:250] for s in salidas if re.search(r"Error|Warning|Aviso", s)]
-            print(f"\n=== {html}: bloqueadas r-wasm: {len(externas)}");print(f"=== {html}: {len(salidas)} contenedores ({vacias} vacíos); errores/avisos en autorun: {len(errs_r)}; JS: {errores[:3]}")
+            print(f"\n=== {html}: bloqueadas CDN: {len(externas)}");print(f"=== {html}: {len(salidas)} contenedores ({vacias} vacíos); errores/avisos en autorun: {len(errs_r)}; JS: {errores[:3]}")
             for e in errs_r: print("   R>", e.replace("\n", " | "))
             for ej, codigo in soluciones(qmd).items():
                 cid = pg.evaluate(JS_LOCALIZA, ej)
