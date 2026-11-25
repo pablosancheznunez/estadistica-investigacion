@@ -183,6 +183,38 @@ if (isTRUE(all.equal(as.numeric(.result), 1 - 0.95^10))) list(correct = TRUE, me
   list(correct = FALSE, message = "Eleva a 10.")
 ```
 
+## Caso práctico resuelto
+
+::: {.callout-note appearance="simple" icon="false"}
+## Leer bien un valor p
+Un estudio informa: diferencia de 3 puntos en la nota entre quienes hicieron un taller y quienes no; t(118) = 2,1; p = 0,038.
+
+Lo que significa: si no hubiera ninguna diferencia en la población, sería poco frecuente (en torno al 4 % de las veces) observar una diferencia como esta o mayor.
+
+Lo que **no** significa:
+
+- No es la probabilidad de que la hipótesis nula sea cierta.
+- No dice que el efecto sea grande o importante: hay que mirar el tamaño del efecto y su intervalo.
+- p = 0,038 y p = 0,052 no son resultados opuestos: la evidencia es muy parecida.
+
+Informe completo: diferencia de 3 puntos, IC 95 % [0,2; 5,8], d de Cohen ≈ 0,38, p = 0,038.
+:::
+
+## Ejercicios graduados
+
+**Básico.** Un estudio obtiene p = 0,30. ¿Demuestra que no hay efecto?
+
+::: {.webex-solution boton="Ver solución"}
+No: un resultado no significativo no demuestra la ausencia de efecto. Puede deberse a poca potencia; hay que mirar el intervalo de confianza para ver qué efectos son compatibles con los datos.
+:::
+
+**Avanzado.** Busca en un artículo de tu campo un resultado con valor p y reescribe su descripción con tamaño del efecto e intervalo de confianza.
+
+::: {.webex-solution boton="Ver solución"}
+La reescritura debe sustituir «significativo» por la magnitud del efecto con su incertidumbre y valorar su relevancia práctica.
+:::
+
+
 ## Actividades
 
 ::: {.clasificar #ia-c4-mitos titulo="Con p = 0,03, ¿la afirmación es correcta?" categorias="Correcta|Incorrecta"}

@@ -184,6 +184,33 @@ if (isTRUE(all.equal(as.numeric(.result), (mean(aa) - mean(bb)) / sqrt((var(aa) 
   list(correct = FALSE, message = "Suma var(b) dentro de la raíz.")
 ```
 
+## Caso práctico resuelto
+
+::: {.callout-note appearance="simple" icon="false"}
+## Calcular el tamaño muestral antes de empezar
+Quieres comparar la ansiedad de dos grupos. Estudios previos sugieren un efecto pequeño-moderado, d = 0,3. Con α = 0,05 bilateral y potencia del 80 %:
+
+- En R: `power.t.test(delta = 0.3, sd = 1, sig.level = 0.05, power = 0.8)` devuelve unas **176 personas por grupo**.
+- Si solo puedes reclutar 50 por grupo, la potencia para d = 0,3 es de un 32 %: lo más probable es no detectar el efecto aunque exista.
+
+Opciones: colaborar con otros grupos para aumentar la muestra, usar un diseño intrasujeto (más eficiente), medir con menos error o plantear el estudio como piloto y estimar el efecto en lugar de contrastarlo.
+:::
+
+## Ejercicios graduados
+
+**Básico.** ¿Qué pasa con el tamaño muestral necesario si el efecto esperado se reduce a la mitad?
+
+::: {.webex-solution boton="Ver solución"}
+Se multiplica aproximadamente por cuatro, porque el tamaño muestral depende del inverso del cuadrado del efecto.
+:::
+
+**Avanzado.** Calcula con `power.t.test` el tamaño muestral para d = 0,2, 0,5 y 0,8 y comenta qué implicaciones tiene para tu investigación.
+
+::: {.webex-solution boton="Ver solución"}
+Aproximadamente 394, 64 y 26 por grupo. Los efectos pequeños, frecuentes en las ciencias sociales, exigen muestras grandes.
+:::
+
+
 ## Actividades
 
 ::: {.clasificar #ia-c5-potencia titulo="¿La potencia sube o baja?" categorias="Sube|Baja"}

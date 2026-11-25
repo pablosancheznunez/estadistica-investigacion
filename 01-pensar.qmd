@@ -111,6 +111,36 @@ if (isTRUE(all.equal(as.numeric(.result), esperado))) list(correct = TRUE, messa
   list(correct = FALSE, message = "Filtra con d$grupo == \"tutoria\".")
 ```
 
+## Caso práctico resuelto
+
+::: {.callout-note appearance="simple" icon="false"}
+## De la pregunta al análisis: un plan antes de mirar los datos
+Pregunta: ¿duermen menos los doctorandos con más ansiedad?
+
+1. **Tipo de pregunta:** asociación (no causal), en una muestra observacional.
+2. **Variables:** ansiedad (escala continua), horas de sueño (continua); covariables posibles: horas de trabajo, grupo.
+3. **Análisis previsto:** correlación y regresión lineal del sueño sobre la ansiedad, con intervalo de confianza.
+4. **Decisiones fijadas antes:** exclusiones (cuestionarios incompletos), tratamiento de valores extremos, umbral de significación o, mejor, interpretación por el tamaño del efecto.
+5. **Interpretación prevista:** «se asocia con», nunca «causa».
+
+Escribir el plan antes de ver los datos (y, si es posible, preregistrarlo) protege frente al «jardín de los senderos que se bifurcan».
+:::
+
+## Ejercicios graduados
+
+**Básico.** Clasifica la pregunta «¿Mejora la nota un taller de técnicas de estudio asignado al azar?»: descriptiva, de asociación o causal.
+
+::: {.webex-solution boton="Ver solución"}
+Causal: hay una intervención asignada al azar, lo que permite atribuir las diferencias al taller.
+:::
+
+**Avanzado.** Escribe un plan de análisis de cinco puntos para una pregunta de tu tesis.
+
+::: {.webex-solution boton="Ver solución"}
+Debe incluir tipo de pregunta, variables y unidades, análisis principal, decisiones fijadas de antemano y cómo se interpretará un resultado nulo.
+:::
+
+
 ## Actividades
 
 ::: {.clasificar #ia-c1-pregunta titulo="¿Qué tipo de pregunta es?" categorias="Descriptiva|Exploratoria|Inferencial|Predictiva|Causal|Mecanicista"}

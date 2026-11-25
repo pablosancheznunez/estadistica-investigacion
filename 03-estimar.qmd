@@ -173,6 +173,32 @@ if (isTRUE(all.equal(as.numeric(.result), as.numeric(t.test(dd$nota, conf.level 
   list(correct = FALSE, message = "Escribe conf.level = 0.99.")
 ```
 
+## Caso práctico resuelto
+
+::: {.callout-note appearance="simple" icon="false"}
+## Interpretar un intervalo de confianza
+En una muestra de 120 doctorandos, la media de horas de sueño es 6,8 con un intervalo de confianza del 95 % de [6,6; 7,0].
+
+- **Interpretación correcta:** el procedimiento que genera estos intervalos captura el valor poblacional en el 95 % de las muestras; los valores entre 6,6 y 7,0 son compatibles con los datos.
+- **Interpretación incorrecta:** «hay un 95 % de probabilidad de que la media verdadera esté entre 6,6 y 7,0» (en el enfoque frecuentista, el parámetro es fijo; la probabilidad se refiere al procedimiento).
+- **Precisión:** un intervalo estrecho indica una estimación precisa; para reducirlo a la mitad hace falta aproximadamente cuadruplicar la muestra.
+:::
+
+## Ejercicios graduados
+
+**Básico.** Si con n = 100 el margen de error es ±0,4, ¿qué margen aproximado tendrás con n = 400?
+
+::: {.webex-solution boton="Ver solución"}
+Aproximadamente ±0,2: el error típico depende de 1/√n, y √400 = 2 × √100.
+:::
+
+**Avanzado.** Simula en R 100 intervalos de confianza de muestras de una población conocida y cuenta cuántos contienen el valor verdadero.
+
+::: {.webex-solution boton="Ver solución"}
+Deberían ser alrededor de 95. Este ejercicio muestra que la confianza es una propiedad del procedimiento, no de un intervalo concreto.
+:::
+
+
 ## Actividades
 
 ::: {.clasificar #ia-c3-interpreta titulo="¿Interpretación correcta del IC 95 % [5,99; 6,53]?" categorias="Correcta|Incorrecta"}

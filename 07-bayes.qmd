@@ -177,6 +177,34 @@ if (isTRUE(all.equal(as.numeric(.result), qbeta(c(0.025, 0.975), 16, 6)))) list(
   list(correct = FALSE, message = "Usa 0.975.")
 ```
 
+## Caso práctico resuelto
+
+::: {.callout-note appearance="simple" icon="false"}
+## Actualizar una creencia con datos
+Quieres estimar la proporción de doctorandos que publican durante el primer año. A priori, por estudios previos, crees que ronda el 20 % (distribución Beta(2, 8)). Observas 15 que publican de 40.
+
+- **Posterior:** Beta(2 + 15, 8 + 25) = Beta(17, 33).
+- **Media posterior:** 17 / 50 = 0,34. Los datos (15/40 = 0,375) acercan la estimación hacia ellos, moderados por la información previa.
+- **Intervalo de credibilidad del 95 %:** aproximadamente [0,22; 0,47]; aquí sí puede decirse que hay un 95 % de probabilidad (según el modelo) de que la proporción esté en ese intervalo.
+
+Con más datos, la información previa pesa cada vez menos.
+:::
+
+## Ejercicios graduados
+
+**Básico.** Con una previa Beta(1, 1) y 15 éxitos en 20 intentos, ¿cuál es la media posterior?
+
+::: {.webex-solution boton="Ver solución"}
+(1 + 15) / (1 + 1 + 20) = 16 / 22 ≈ 0,73.
+:::
+
+**Avanzado.** Compara la posterior con tres previas distintas (poco informativa, optimista y pesimista) para los mismos datos y comenta la sensibilidad del resultado.
+
+::: {.webex-solution boton="Ver solución"}
+Con pocos datos, la previa influye bastante; con muchos, las tres posteriores convergen. Informar del análisis de sensibilidad es una buena práctica.
+:::
+
+
 ## Actividades
 
 ::: {.clasificar #ia-c7-concepto titulo="¿De qué concepto se trata?" categorias="Previa|Verosimilitud|Posterior|Factor de Bayes"}

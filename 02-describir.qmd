@@ -182,6 +182,34 @@ if (isTRUE(all.equal(as.numeric(.result), cor(dd$ansiedad, dd$sueno)))) list(cor
   list(correct = FALSE, message = "Usa la columna sueno.")
 ```
 
+## Caso práctico resuelto
+
+::: {.callout-note appearance="simple" icon="false"}
+## Describir una variable asimétrica
+Las citas de un grupo de 20 artículos: 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 8, 9, 10, 12, 140.
+
+- **Media:** 11,4. **Mediana:** 4,5. La media se dispara por un solo artículo.
+- **Desviación típica** muy alta; el **rango intercuartílico** (de 2 a 7,5) describe mejor la dispersión típica.
+- **Gráfico:** un histograma o un diagrama de caja muestra la asimetría y el valor atípico; un gráfico de barras con la media lo ocultaría.
+
+Regla práctica: con distribuciones asimétricas, informa de la **mediana y el rango intercuartílico**, y muestra los datos.
+:::
+
+## Ejercicios graduados
+
+**Básico.** ¿Qué medida de tendencia central usarías para los ingresos de una población? ¿Por qué?
+
+::: {.webex-solution boton="Ver solución"}
+La mediana: los ingresos son muy asimétricos y unos pocos valores muy altos elevan la media.
+:::
+
+**Avanzado.** Con el conjunto `estudio.csv` del libro, describe la variable `horas` con medidas y un gráfico adecuados y justifica la elección.
+
+::: {.webex-solution boton="Ver solución"}
+Comprueba primero la forma de la distribución; si es aproximadamente simétrica, media y desviación típica son adecuadas; si no, mediana y rango intercuartílico. El gráfico debe mostrar la distribución, no solo un resumen.
+:::
+
+
 ## Actividades
 
 ::: {.clasificar #ia-c2-resumen titulo="¿Media o mediana?" categorias="Media|Mediana"}
