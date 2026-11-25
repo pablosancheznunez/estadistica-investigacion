@@ -43,18 +43,18 @@ jobs:
         run: python herramientas/pruebas/ejercicios.py . 60 00-r-en-el-libro.qmd 01-pensar.qmd 02-describir.qmd 03-estimar.qmd 04-contrastes.qmd 05-efecto-potencia.qmd 06-regresion.qmd 07-bayes.qmd
 
       - name: Preguntas de autoevaluación
-        run: python herramientas/pruebas/autoevaluacion.py _book index.html 00-r-en-el-libro.html 01-pensar.html 02-describir.html 03-estimar.html 04-contrastes.html 05-efecto-potencia.html 06-regresion.html 07-bayes.html 90-chuleta.html 91-guia-docente.html 92-glosario.html
+        run: python herramientas/pruebas/autoevaluacion.py _book index.html 00-r-en-el-libro.html 01-pensar.html 02-describir.html 03-estimar.html 04-contrastes.html 05-efecto-potencia.html 06-regresion.html 07-bayes.html 90-chuleta.html 94-laboratorio.html 91-guia-docente.html 92-glosario.html
 
       - name: Accesibilidad (axe-core, WCAG 2.1 AA)
         env:
           AXE_JS: node_modules/axe-core/axe.min.js
-        run: python herramientas/pruebas/accesibilidad.py _book index.html 00-r-en-el-libro.html 01-pensar.html 02-describir.html 03-estimar.html 04-contrastes.html 05-efecto-potencia.html 06-regresion.html 07-bayes.html 90-chuleta.html 91-guia-docente.html 92-glosario.html
+        run: python herramientas/pruebas/accesibilidad.py _book index.html 00-r-en-el-libro.html 01-pensar.html 02-describir.html 03-estimar.html 04-contrastes.html 05-efecto-potencia.html 06-regresion.html 07-bayes.html 90-chuleta.html 94-laboratorio.html 91-guia-docente.html 92-glosario.html
 
       - name: Accesibilidad en modo oscuro
         env:
           AXE_JS: node_modules/axe-core/axe.min.js
           MODO: oscuro
-        run: python herramientas/pruebas/accesibilidad.py _book index.html 00-r-en-el-libro.html 01-pensar.html 02-describir.html 03-estimar.html 04-contrastes.html 05-efecto-potencia.html 06-regresion.html 07-bayes.html 90-chuleta.html 91-guia-docente.html 92-glosario.html
+        run: python herramientas/pruebas/accesibilidad.py _book index.html 00-r-en-el-libro.html 01-pensar.html 02-describir.html 03-estimar.html 04-contrastes.html 05-efecto-potencia.html 06-regresion.html 07-bayes.html 90-chuleta.html 94-laboratorio.html 91-guia-docente.html 92-glosario.html
 
       - uses: actions/upload-artifact@v4
         if: always()
