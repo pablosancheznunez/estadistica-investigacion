@@ -30,7 +30,7 @@ Kruschke, J. K.; Liddell, T. M. (2018). [The Bayesian new statistics: Hypothesis
 
 ### Lecturas complementarias {.unnumbered}
 
-- Wagenmakers, E.-J.; Marsman, M.; Jamil, T.; Ly, A.; Verhagen, J.; Love, J. et al. (2018). [Bayesian inference for psychology. Part I: Theoretical advantages and practical ramifications](https://doi.org/10.3758/s13423-017-1343-3). *Psychonomic Bulletin & Review*, 25(1), 35-57.
+- @wagenmakers2018
 
 ## 1. Probabilidad como grado de creencia
 

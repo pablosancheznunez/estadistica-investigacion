@@ -30,7 +30,7 @@ Lakens, D. (2022). [Sample size justification](https://doi.org/10.1525/collabra.
 
 ### Lecturas complementarias {.unnumbered}
 
-- Lakens, D. (2013). [Calculating and reporting effect sizes to facilitate cumulative science: A practical primer for *t*-tests and ANOVAs](https://doi.org/10.3389/fpsyg.2013.00863). *Frontiers in Psychology*, 4, 863.
+- @lakens2013
 
 ## 1. Cuánto, no solo si
 
@@ -120,7 +120,7 @@ viewof w_n = rango("Personas por grupo", [5, 300], {step: 5, value: 60})
 
 ## 3. Justificar el tamaño de la muestra
 
-Lakens (2022) distingue seis formas legítimas de justificar una muestra: medir a **toda la población**, limitaciones de **recursos**, análisis de **potencia** a priori, búsqueda de una **precisión** dada (anchura del intervalo), **heurísticos** y **ninguna justificación** (que hay que reconocer). Para el análisis de potencia, la clave es el **efecto mínimo de interés**: el más pequeño que tendría importancia teórica o práctica, no el que esperamos ni el de un estudio piloto pequeño (que suele estar inflado).
+@lakens2022 distingue seis formas legítimas de justificar una muestra: medir a **toda la población**, limitaciones de **recursos**, análisis de **potencia** a priori, búsqueda de una **precisión** dada (anchura del intervalo), **heurísticos** y **ninguna justificación** (que hay que reconocer). Para el análisis de potencia, la clave es el **efecto mínimo de interés**: el más pequeño que tendría importancia teórica o práctica, no el que esperamos ni el de un estudio piloto pequeño (que suele estar inflado).
 
 ### Ejercicio 5.1 {.unnumbered}
 
@@ -221,7 +221,7 @@ Aproximadamente 394, 64 y 26 por grupo. Los efectos pequeños, frecuentes en las
 - Usar un diseño intrasujeto en lugar de entre grupos → Sube // Si las medidas están correlacionadas.
 :::
 
-::: {.clasificar #ia-c5-justif titulo="¿Qué justificación de la muestra es (Lakens, 2022)?" categorias="Toda la población|Recursos|Análisis de potencia|Precisión"}
+::: {.clasificar #ia-c5-justif titulo="¿Qué justificación de la muestra es [@lakens2022]?" categorias="Toda la población|Recursos|Análisis de potencia|Precisión"}
 - Estudiamos los 47 programas de doctorado de la universidad → Toda la población
 - Solo hay presupuesto para 80 participantes → Recursos // Hay que decir qué se podrá concluir con ellos.
 - Calculamos la muestra para un 90 % de potencia ante el efecto mínimo de interés → Análisis de potencia
@@ -235,7 +235,7 @@ Aproximadamente 394, 64 y 26 por grupo. Los efectos pequeños, frecuentes en las
 1. Para tu próximo estudio, define el **efecto mínimo de interés** y justifícalo (teoría, relevancia práctica, coste).
 2. Haz un **análisis de potencia** con R para varios escenarios y presenta una curva de potencia.
 3. Si tus recursos limitan la muestra, calcula qué efectos podrás detectar con ella (análisis de sensibilidad).
-4. Redacta el párrafo de justificación de la muestra para tu preregistro o tu artículo, siguiendo a Lakens (2022).
+4. Redacta el párrafo de justificación de la muestra para tu preregistro o tu artículo, siguiendo a @lakens2022.
 
 **Entrega:** con la [plantilla de entrega](plantillas/entrega_reto.qmd). Este reto **no tiene solución en el libro**.
 :::

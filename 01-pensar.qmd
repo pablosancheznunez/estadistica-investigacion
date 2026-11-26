@@ -31,7 +31,7 @@ Leek, J. T.; Peng, R. D. (2015). [What is the question?](https://doi.org/10.1126
 
 ## 1. Primero, la pregunta
 
-Leek y Peng (2015) sostienen que el error estadístico más frecuente no es de cálculo, sino de **pregunta**: usar un análisis que responde a una pregunta distinta de la que se quería responder. Proponen seis tipos:
+@leek2015 sostienen que el error estadístico más frecuente no es de cálculo, sino de **pregunta**: usar un análisis que responde a una pregunta distinta de la que se quería responder. Proponen seis tipos:
 
 | Tipo | Pregunta | Ejemplo |
 |---|---|---|

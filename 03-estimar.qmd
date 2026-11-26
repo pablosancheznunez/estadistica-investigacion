@@ -34,7 +34,7 @@ Si repitieras el estudio con otros 120 doctorandos, la media sería otra. La **d
 
 ## 2. El intervalo de confianza
 
-Un **intervalo de confianza del 95 %** es un procedimiento que, si se repitiera el estudio muchas veces, contendría el valor verdadero en el 95 % de las repeticiones. Para un estudio concreto, una forma práctica de leerlo (Cumming, 2014) es: el intervalo reúne los **valores del parámetro razonablemente compatibles con los datos**, y los valores del centro son más plausibles que los de los extremos.
+Un **intervalo de confianza del 95 %** es un procedimiento que, si se repitiera el estudio muchas veces, contendría el valor verdadero en el 95 % de las repeticiones. Para un estudio concreto, una forma práctica de leerlo [@cumming2014] es: el intervalo reúne los **valores del parámetro razonablemente compatibles con los datos**, y los valores del centro son más plausibles que los de los extremos.
 
 ::: {.callout-warning appearance="simple" icon="false"}
 ## Interpretaciones erróneas frecuentes
@@ -221,7 +221,7 @@ Deberían ser alrededor de 95. Este ejercicio muestra que la confianza es una pr
 ## Reto del capítulo 3 · Reescribe unos resultados en clave de estimación
 1. Toma un artículo de tu campo que informe solo de valores *p* («la diferencia fue significativa, *p* < 0,05»).
 2. Con los datos que dé (medias, desviaciones, *n*), calcula los **intervalos de confianza** de los efectos principales.
-3. Reescribe el párrafo de resultados centrado en **cuánto** efecto y con **qué precisión**, al estilo de Cumming (2014).
+3. Reescribe el párrafo de resultados centrado en **cuánto** efecto y con **qué precisión**, al estilo de @cumming2014.
 4. Discute si las conclusiones del artículo cambian con esta lectura.
 
 **Entrega:** con la [plantilla de entrega](plantillas/entrega_reto.qmd). Este reto **no tiene solución en el libro**.

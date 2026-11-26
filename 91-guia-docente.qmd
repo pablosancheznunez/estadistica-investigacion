@@ -28,6 +28,8 @@ Laboratorios que se usan sin programar: cuarteto de Anscombe, baile de los inter
 
 Las preguntas están exportadas a **Moodle XML** en la carpeta `moodle/` del repositorio.
 
+**Descarga el banco de preguntas:** [todo el libro (Moodle XML)](moodle/autoevaluacion_todo.xml) · por capítulo: [00](moodle/autoevaluacion_00_r_en_el_libro.xml) · [01](moodle/autoevaluacion_01_pensar.xml) · [02](moodle/autoevaluacion_02_describir.xml) · [03](moodle/autoevaluacion_03_estimar.xml) · [04](moodle/autoevaluacion_04_contrastes.xml) · [05](moodle/autoevaluacion_05_efecto_potencia.xml) · [06](moodle/autoevaluacion_06_regresion.xml) · [07](moodle/autoevaluacion_07_bayes.xml)
+
 ## Diapositivas
 
 [diapositivas/](diapositivas/index.html){target="_blank"} (F, pantalla completa; S, notas).

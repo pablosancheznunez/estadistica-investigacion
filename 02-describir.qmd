@@ -48,7 +48,7 @@ tapply(d$nota, d$grupo, median)   # mediana por grupo
 
 ## 2. Mostrar los datos, no solo las medias
 
-Weissgerber et al. (2015) revisaron artículos de fisiología y encontraron que la mayoría presentaba datos continuos con **gráficos de barras** de medias. El problema: distribuciones muy distintas (con atípicos, bimodales, con pocos datos) producen la misma barra. Recomiendan **gráficos que muestren cada observación** (diagramas de puntos o de dispersión) o, con muchos datos, **diagramas de caja** o de violín.
+@weissgerber2015 revisaron artículos de fisiología y encontraron que la mayoría presentaba datos continuos con **gráficos de barras** de medias. El problema: distribuciones muy distintas (con atípicos, bimodales, con pocos datos) producen la misma barra. Recomiendan **gráficos que muestren cada observación** (diagramas de puntos o de dispersión) o, con muchos datos, **diagramas de caja** o de violín.
 
 ![La misma media puede esconder datos muy distintos. Las cuatro muestras tienen la misma media y casi la misma barra, pero sus puntos cuentan historias diferentes.](figuras/c2_barras.svg){#fig-c2-barras fig-alt="A la izquierda, cuatro barras de igual altura con barras de error. A la derecha, los puntos de las mismas cuatro muestras: una simétrica, otra con un valor atípico muy alto, otra bimodal y otra con solo tres observaciones."}
 
@@ -247,7 +247,7 @@ Responde a todas las preguntas y pulsa **Mostrar respuestas**. No cuenta para la
 1. Con una distribución muy asimétrica, la mediana describe mejor el valor típico que la media. {{< torf true >}}
 2. La medida de dispersión que acompaña a la mediana es el rango {{< fitb "intercuartílico" "intercuartilico" ignorecase=true >}}
 3. Una correlación de Pearson igual a 0 significa que no hay ninguna relación entre las variables. {{< torf false >}}
-4. Según Weissgerber et al. (2015), para datos continuos con muestras pequeñas conviene usar {{< mcq "gráficos de barras" "*gráficos que muestren cada observación" "gráficos de tarta" >}}
+4. Según @weissgerber2015, para datos continuos con muestras pequeñas conviene usar {{< mcq "gráficos de barras" "*gráficos que muestren cada observación" "gráficos de tarta" >}}
 5. Los cuatro conjuntos del cuarteto de Anscombe tienen {{< mcq "gráficos idénticos" "*resúmenes estadísticos casi idénticos" "correlaciones muy distintas" >}}
 6. `tapply(d$nota, d$grupo, mean)` calcula {{< mcq "la media global" "*la media de la nota en cada grupo" "la nota de cada persona" >}}
 7. La correlación de Pearson mide la fuerza de una relación {{< fitb "lineal" ignorecase=true >}}

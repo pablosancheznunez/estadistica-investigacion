@@ -30,8 +30,8 @@ Wasserstein, R. L.; Lazar, N. A. (2016). [The ASA statement on *p*-values: Conte
 
 ### Lecturas complementarias {.unnumbered}
 
-- Greenland, S.; Senn, S. J.; Rothman, K. J.; Carlin, J. B.; Poole, C.; Goodman, S. N.; Altman, D. G. (2016). [Statistical tests, *P* values, confidence intervals, and power: A guide to misinterpretations](https://doi.org/10.1007/s10654-016-0149-3). *European Journal of Epidemiology*, 31(4), 337-350.
-- Halsey, L. G.; Curran-Everett, D.; Vowler, S. L.; Drummond, G. B. (2015). [The fickle *P* value generates irreproducible results](https://doi.org/10.1038/nmeth.3288). *Nature Methods*, 12(3), 179-185.
+- @greenland2016
+- @halsey2015
 
 ## 1. La lógica del contraste
 
@@ -44,7 +44,7 @@ Este procedimiento controla a largo plazo dos errores: el de **tipo I** (rechaza
 
 ## 2. Seis principios de la ASA
 
-En 2016, la American Statistical Association publicó por primera vez una declaración sobre un procedimiento concreto (Wasserstein y Lazar, 2016):
+En 2016, la American Statistical Association publicó por primera vez una declaración sobre un procedimiento concreto [@wasserstein2016]:
 
 1. Los valores *p* pueden indicar cuán incompatibles son los datos con un modelo estadístico concreto.
 2. **No miden** la probabilidad de que la hipótesis sea cierta, ni la de que los datos se deban solo al azar.
@@ -238,7 +238,7 @@ La reescritura debe sustituir «significativo» por la magnitud del efecto con s
 ::: {.callout-important appearance="simple" icon="false"}
 ## Reto del capítulo 4 · Auditoría de los valores *p*
 1. Elige dos artículos de tu campo y localiza todas las afirmaciones basadas en valores *p*.
-2. Clasifícalas según los seis principios de la ASA: ¿cuáles son correctas y cuáles caen en alguno de los errores de Greenland et al. (2016)?
+2. Clasifícalas según los seis principios de la ASA: ¿cuáles son correctas y cuáles caen en alguno de los errores de @greenland2016?
 3. Comprueba si informan de tamaños del efecto e intervalos y si corrigen las comparaciones múltiples.
 4. Reescribe dos conclusiones con un lenguaje correcto.
 
